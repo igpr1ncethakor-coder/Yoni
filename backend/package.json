@@ -1,0 +1,13 @@
+{
+  "name": "yoni-backend",
+  "version": "1.0.0",
+  "description": "Yoni Telegram content backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}
