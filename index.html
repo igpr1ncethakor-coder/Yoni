@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoni</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <div class="brand">Yoni</div>
+
+        <button class="stars-balance" id="starsBalance">
+            ⭐ <span>0</span>
+        </button>
+    </header>
+
+
+    <!-- YONI LOGO -->
+    <section class="logo-banner">
+
+        <img
+            src="yoni-logo.jpg"
+            alt="Yoni 18+"
+        >
+
+    </section>
+
+
+    <!-- INVITE -->
+    <section class="invite-card">
+
+        <div class="invite-text">
+            <h2>🎁 Invite friends</h2>
+
+            <p>
+                Share the app and earn unlock credits.
+            </p>
+        </div>
+
+        <button id="inviteButton">
+            INVITE
+        </button>
+
+    </section>
+
+
+    <!-- SEARCH -->
+    <section class="search-box">
+
+        <input
+            id="searchInput"
+            type="text"
+            placeholder="Search videos..."
+        >
+
+        <button id="searchButton">
+            🔍
+        </button>
+
+    </section>
+
+
+    <!-- CATEGORIES -->
+    <div class="categories">
+
+        <button class="category active">
+            All
+        </button>
+
+        <button class="category">
+            🔥 Trending
+        </button>
+
+        <button class="category">
+            🆕 New
+        </button>
+
+        <button class="category">
+            ⭐ Premium
+        </button>
+
+    </div>
+
+
+    <!-- TRENDING -->
+    <section class="section-header">
+
+        <h2>Trending</h2>
+
+        <button>
+            See all
+        </button>
+
+    </section>
+
+
+    <!-- CONTENT CARD -->
+    <article class="content-card">
+
+        <div class="thumbnail thumbnail-one">
+
+            <span class="new-badge">
+                ⚡ NEW
+            </span>
+
+            <button class="play-button">
+                ▶
+            </button>
+
+            <button class="favorite-button">
+                ♡
+            </button>
+
+            <div class="stats">
+                <span>👁 98</span>
+                <span>⏱ 5:36</span>
+            </div>
+
+        </div>
+
+
+        <div class="content-info">
+
+            <h3>
+                Featured content
+            </h3>
+
+            <p>
+                Unlock this content by sharing the app.
+            </p>
+
+            <div class="unlock-row">
+
+                <button class="unlock-button">
+                    🔗 SHARE TO UNLOCK
+                </button>
+
+                <span class="unlock-count">
+                    0/3
+                </span>
+
+            </div>
+
+        </div>
+
+    </article>
+
+
+    <!-- PREMIUM CARD -->
+    <article class="content-card">
+
+        <div class="thumbnail thumbnail-two">
+
+            <span class="premium-badge">
+                ⭐ PREMIUM
+            </span>
+
+            <button class="play-button">
+                ▶
+            </button>
+
+            <button class="favorite-button">
+                ♡
+            </button>
+
+            <div class="stats">
+                <span>👁 156</span>
+                <span>⏱ 8:21</span>
+            </div>
+
+        </div>
+
+
+        <div class="content-info">
+
+            <h3>
+                Premium content
+            </h3>
+
+            <p>
+                Unlock with Telegram Stars.
+            </p>
+
+            <div class="unlock-row">
+
+                <button class="stars-button">
+                    ⭐ BUY FOR 50 STARS
+                </button>
+
+            </div>
+
+        </div>
+
+    </article>
+
+
+    <!-- PHOTO CARD -->
+    <article class="content-card">
+
+        <div class="thumbnail thumbnail-three">
+
+            <span class="premium-badge">
+                ⭐ PREMIUM PHOTO
+            </span>
+
+            <button class="favorite-button">
+                ♡
+            </button>
+
+        </div>
+
+
+        <div class="content-info">
+
+            <h3>
+                Premium photo
+            </h3>
+
+            <p>
+                Unlock with Telegram Stars.
+            </p>
+
+            <div class="unlock-row">
+
+                <button class="stars-button">
+                    ⭐ BUY FOR 25 STARS
+                </button>
+
+            </div>
+
+        </div>
+
+    </article>
+
+</div>
+
+
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottom-nav">
+
+    <button class="nav-item active">
+        <span>⌂</span>
+        <small>Home</small>
+    </button>
+
+    <button class="nav-item">
+        <span>♡</span>
+        <small>Saved</small>
+    </button>
+
+    <button class="nav-item">
+        <span>🔥</span>
+        <small>Trending</small>
+    </button>
+
+    <button class="nav-item">
+        <span>♙</span>
+        <small>Profile</small>
+    </button>
+
+</nav>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
