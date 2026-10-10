@@ -1,274 +1,383 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yoni</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050307">
+<title>Yoni</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+ --bg:#08040c;--panel:#13091a;--pink:#ff20ae;
+ --purple:#a328ff;--border:#56265e;--text:#fff;--muted:#b8a7c2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#270b2b,var(--bg) 55%);color:var(--text);font-family:Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:700px;margin:auto;padding:15px 15px 100px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:5px 3px 18px}
+.brand{font-size:31px;font-weight:900;background:linear-gradient(90deg,#ff39ba,#b06aff,#fff0c8);color:transparent;background-clip:text;-webkit-background-clip:text}
+.stars-balance{background:#180c20;color:white;border:1px solid var(--border);border-radius:25px;padding:10px 14px}
+.logo-banner{height:130px;border:1px solid #65235e;border-radius:18px;overflow:hidden;margin-bottom:16px;background:linear-gradient(135deg,#25102c,#100713);display:grid;place-items:center}
+.logo-banner img{width:100%;height:100%;object-fit:cover}
+.logo-placeholder{text-align:center;color:#ff60cb}
+.logo-placeholder strong{font-size:34px}
+.invite-card{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:17px;border-radius:22px;background:linear-gradient(110deg,#ff17a7,#9b22ff,#dc3cae);margin-bottom:18px}
+.invite-card h2{font-size:21px;margin:0 0 6px}
+.invite-card p{font-size:13px;margin:0;color:#fff0fb}
+.invite-card button{border:0;background:#09040e;color:white;padding:12px 15px;border-radius:22px;font-weight:bold}
+.search-box{display:flex;gap:9px;margin:17px 0}
+.search-box input{flex:1;min-width:0;background:#100713;color:white;border:1px solid var(--border);border-radius:25px;padding:15px}
+.search-box button{width:52px;border:0;border-radius:50%;color:white;background:linear-gradient(130deg,var(--pink),var(--purple))}
+.categories,.horizontal{display:flex;gap:9px;overflow-x:auto;padding:4px 0 13px;scrollbar-width:none}
+.category{flex-shrink:0;padding:10px 14px;border:1px solid var(--border);border-radius:22px;background:#170b1e;color:#ead8ef}
+.category.active{background:linear-gradient(100deg,var(--pink),var(--purple));color:white}
+.section-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:23px 0 12px}
+.section-header h2{font-size:23px;margin:0}
+.text-button{background:none;border:0;color:#e38bff;padding:8px}
+.collection{flex:0 0 145px;width:145px;padding:6px;text-align:left;color:white;background:linear-gradient(140deg,#1c0d25,#0d0611);border:1px solid var(--border);border-radius:15px}
+.collection img,.collection-placeholder{display:flex;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:10px}
+.collection-placeholder{align-items:center;justify-content:center;background:linear-gradient(135deg,#28102f,#100713);border:1px dashed #8231a6;font-size:26px}
+.collection strong{display:block;padding:8px 3px 4px;font-size:14px}
+.collection small{display:block;color:var(--muted);padding:0 3px 5px}
+.feed{display:grid;grid-template-columns:1fr;gap:15px}
+.content-card{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:linear-gradient(140deg,#190b21,#0d0711)}
+.thumbnail{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#301036,#110817)}
+.thumbnail img{width:100%;height:100%;object-fit:cover}
+.thumbnail-placeholder{height:100%;display:grid;place-items:center;font-size:34px}
+.badge{position:absolute;top:9px;left:9px;padding:5px 8px;background:#ed179d;border-radius:7px;font-size:10px;font-weight:bold}
+.play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:#08030dcc;border:1px solid #ffffff88;color:white;font-size:20px}
+.duration{position:absolute;right:9px;bottom:8px;background:#000b;padding:5px 7px;border-radius:6px;font-size:11px}
+.content-info{padding:13px}
+.content-info h3{font-size:17px;margin:0 0 7px;overflow-wrap:anywhere}
+.stats{font-size:12px;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+.action{flex:1;min-width:67px;padding:9px 6px;background:#1a0c23;border:1px solid #4a2357;border-radius:11px;color:white;font-size:12px}
+.action.hot{background:linear-gradient(100deg,#ed159e,#9226ff);border:0}
+.gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.photo-card{padding:6px;border:1px solid var(--border);border-radius:15px;background:#13091a;color:white;text-align:left;min-width:0}
+.photo-card img,.photo-placeholder{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px}
+.photo-placeholder{display:grid;place-items:center;background:linear-gradient(135deg,#301036,#110817);font-size:28px}
+.photo-card strong{display:block;padding:8px 3px 4px}
+.panel{margin:14px 0;padding:17px;border:1px solid var(--border);border-radius:18px;background:#13091a}
+.profile{text-align:center}
+.avatar{width:70px;height:70px;margin:auto;display:grid;place-items:center;border-radius:50%;font-size:32px;background:linear-gradient(130deg,var(--pink),var(--purple))}
+.field{width:100%;min-width:0;padding:12px;border-radius:11px;background:#0b0610;border:1px solid var(--border);color:white}
+.label{display:block;text-align:left;margin:12px 0 6px;font-size:13px;color:#edbaf0}
+.form-button{padding:11px 14px;margin:8px 5px 0 0;border:0;border-radius:11px;background:linear-gradient(100deg,var(--pink),var(--purple));color:white}
+.danger{background:#6c1d3c}
+.stat{display:flex;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid #38203f}
+.muted{font-size:12px;color:var(--muted)}
+.bottom-nav{position:fixed;z-index:5;bottom:9px;left:50%;transform:translateX(-50%);width:min(670px,calc(100% - 24px));display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:8px;background:#0d0614f5;backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:23px}
+.nav-item{border:0;background:none;color:#95849d;display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 2px}
+.nav-item span{font-size:24px;font-weight:900}
+.nav-item small{font-size:11px}
+.nav-item.active{color:#ff45c3}
+.hidden{display:none!important}
+.notice{text-align:center;color:var(--muted);padding:25px 8px}
+.modal{position:fixed;inset:0;z-index:10;overflow:auto;padding:15px;background:#050207ed}
+.modal-box{max-width:570px;margin:15px auto;background:#13091a;border:1px solid var(--border);border-radius:18px;padding:16px}
+.modal-head{display:flex;justify-content:space-between;align-items:center}
+.modal-head h2{margin:0;font-size:21px}
+.close{border:0;background:none;color:white;font-size:28px}
+.editor-row{padding:12px 0;border-bottom:1px solid #38203f;overflow-wrap:anywhere}
+textarea.field{min-height:75px;resize:vertical}
+@media(min-width:560px){.feed{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
 </head>
-
 <body>
-
-<div class="app">
-
-    <!-- TOP BAR -->
-    <header class="topbar">
-        <div class="brand">Yoni</div>
-
-        <button class="stars-balance" id="starsBalance">
-            ⭐ <span>0</span>
-        </button>
-    </header>
-
-
-    <!-- YONI LOGO -->
-    <section class="logo-banner">
-
-        <img
-            src="yoni-logo.jpg"
-            alt="Yoni 18+"
-        >
-
-    </section>
-
-
-    <!-- INVITE -->
-    <section class="invite-card">
-
-        <div class="invite-text">
-            <h2>🎁 Invite friends</h2>
-
-            <p>
-                Share the app and earn unlock credits.
-            </p>
-        </div>
-
-        <button id="inviteButton">
-            INVITE
-        </button>
-
-    </section>
-
-
-    <!-- SEARCH -->
-    <section class="search-box">
-
-        <input
-            id="searchInput"
-            type="text"
-            placeholder="Search videos..."
-        >
-
-        <button id="searchButton">
-            🔍
-        </button>
-
-    </section>
-
-
-    <!-- CATEGORIES -->
-    <div class="categories">
-
-        <button class="category active">
-            All
-        </button>
-
-        <button class="category">
-            🔥 Trending
-        </button>
-
-        <button class="category">
-            🆕 New
-        </button>
-
-        <button class="category">
-            ⭐ Premium
-        </button>
-
-    </div>
-
-
-    <!-- TRENDING -->
-    <section class="section-header">
-
-        <h2>Trending</h2>
-
-        <button>
-            See all
-        </button>
-
-    </section>
-
-
-    <!-- CONTENT CARD -->
-    <article class="content-card">
-
-        <div class="thumbnail thumbnail-one">
-
-            <span class="new-badge">
-                ⚡ NEW
-            </span>
-
-            <button class="play-button">
-                ▶
-            </button>
-
-            <button class="favorite-button">
-                ♡
-            </button>
-
-            <div class="stats">
-                <span>👁 98</span>
-                <span>⏱ 5:36</span>
-            </div>
-
-        </div>
-
-
-        <div class="content-info">
-
-            <h3>
-                Featured content
-            </h3>
-
-            <p>
-                Unlock this content by sharing the app.
-            </p>
-
-            <div class="unlock-row">
-
-                <button class="unlock-button">
-                    🔗 SHARE TO UNLOCK
-                </button>
-
-                <span class="unlock-count">
-                    0/3
-                </span>
-
-            </div>
-
-        </div>
-
-    </article>
-
-
-    <!-- PREMIUM CARD -->
-    <article class="content-card">
-
-        <div class="thumbnail thumbnail-two">
-
-            <span class="premium-badge">
-                ⭐ PREMIUM
-            </span>
-
-            <button class="play-button">
-                ▶
-            </button>
-
-            <button class="favorite-button">
-                ♡
-            </button>
-
-            <div class="stats">
-                <span>👁 156</span>
-                <span>⏱ 8:21</span>
-            </div>
-
-        </div>
-
-
-        <div class="content-info">
-
-            <h3>
-                Premium content
-            </h3>
-
-            <p>
-                Unlock with Telegram Stars.
-            </p>
-
-            <div class="unlock-row">
-
-                <button class="stars-button">
-                    ⭐ BUY FOR 50 STARS
-                </button>
-
-            </div>
-
-        </div>
-
-    </article>
-
-
-    <!-- PHOTO CARD -->
-    <article class="content-card">
-
-        <div class="thumbnail thumbnail-three">
-
-            <span class="premium-badge">
-                ⭐ PREMIUM PHOTO
-            </span>
-
-            <button class="favorite-button">
-                ♡
-            </button>
-
-        </div>
-
-
-        <div class="content-info">
-
-            <h3>
-                Premium photo
-            </h3>
-
-            <p>
-                Unlock with Telegram Stars.
-            </p>
-
-            <div class="unlock-row">
-
-                <button class="stars-button">
-                    ⭐ BUY FOR 25 STARS
-                </button>
-
-            </div>
-
-        </div>
-
-    </article>
-
+<main class="app">
+<header class="topbar">
+<div class="brand" id="brand">Yoni</div>
+<button class="stars-balance" id="balance">⭐ 0</button>
+</header>
+
+<section class="logo-banner" id="banner"></section>
+
+<section class="invite-card">
+<div><h2>🎁 Invite friends</h2><p>Share Yoni with your friends.</p></div>
+<button id="invite">INVITE</button>
+</section>
+
+<div class="search-box">
+<input id="search" placeholder="Search videos, albums and photos...">
+<button id="searchBtn">🔎</button>
 </div>
 
+<div class="categories" id="categories"></div>
 
-<!-- BOTTOM NAVIGATION -->
+<section id="homeScreen">
+<div class="section-header"><h2>Collections</h2><button class="text-button" data-edit="collections">Edit</button></div>
+<div class="horizontal" id="collections"></div>
+<div class="section-header"><h2 id="feedTitle">Trending for you</h2><button class="text-button" id="seeAll">See all</button></div>
+<div class="feed" id="videos"></div>
+</section>
+
+<section id="galleryScreen" class="hidden">
+<div class="section-header"><h2>Photo Albums</h2><button class="text-button" data-edit="albums">Edit albums</button></div>
+<div class="gallery-grid" id="albumGrid"></div>
+<div id="albumDetail" class="hidden">
+<div class="section-header"><h2 id="albumName"></h2><button class="text-button" id="backAlbums">← Albums</button></div>
+<p class="muted" id="photoCount"></p>
+<div class="gallery-grid" id="photos"></div>
+</div>
+</section>
+
+<section id="savedScreen" class="hidden">
+<div class="section-header"><h2>Saved</h2></div>
+<div class="feed" id="savedItems"></div>
+<p class="notice hidden" id="savedEmpty">Nothing saved yet.</p>
+</section>
+
+<section id="profileScreen" class="hidden">
+<div class="section-header"><h2>My Profile</h2></div>
+<div class="panel profile">
+<div class="avatar">♙</div><h2 id="profileName">Yoni Member</h2>
+<p class="muted">Your activity on this device</p>
+<label class="label" for="displayName">Display name</label>
+<input class="field" id="displayName" placeholder="Your name">
+<button class="form-button" id="saveName">Save profile</button>
+</div>
+<div class="panel">
+<div class="stat"><span>⭐ Stars balance</span><strong id="pStars">0</strong></div>
+<div class="stat"><span>♥ Saved items</span><strong id="pSaved">0</strong></div>
+<div class="stat"><span>▶ Viewing history</span><strong id="pHistory">0</strong></div>
+<div class="stat"><span>⭐ Demo Stars spent</span><strong id="pSpent">0</strong></div>
+<div class="stat"><span>🎁 Referral count</span><strong id="pReferrals">0</strong></div>
+</div>
+<div class="panel"><h3>Referral program</h3><p class="muted">Real referral rewards require bot/backend verification.</p><button class="form-button" id="referral">Share referral link</button></div>
+<div class="panel"><h3>Viewing history</h3><div id="history"></div><button class="form-button danger" id="clearHistory">Clear history</button></div>
+<div class="panel"><h3>Manage your app</h3><button class="form-button" id="openEditor">Open content editor</button><button class="form-button" id="export">Export backup</button><label class="label" for="import">Restore backup</label><input class="field" id="import" type="file" accept=".json,application/json"></div>
+</section>
+<p class="notice hidden" id="empty">No results found.</p>
+</main>
+
 <nav class="bottom-nav">
-
-    <button class="nav-item active">
-        <span>⌂</span>
-        <small>Home</small>
-    </button>
-
-    <button class="nav-item">
-        <span>♡</span>
-        <small>Saved</small>
-    </button>
-
-    <button class="nav-item">
-        <span>🔥</span>
-        <small>Trending</small>
-    </button>
-
-    <button class="nav-item">
-        <span>♙</span>
-        <small>Profile</small>
-    </button>
-
+<button class="nav-item active" data-page="home"><span>⌂</span><small>Home</small></button>
+<button class="nav-item" data-page="saved"><span>♡</span><small>Saved</small></button>
+<button class="nav-item" data-page="gallery"><span>OF</span><small>Gallery</small></button>
+<button class="nav-item" data-page="profile"><span>♙</span><small>Profile</small></button>
 </nav>
 
+<div class="modal hidden" id="modal"><div class="modal-box">
+<div class="modal-head"><h2 id="modalTitle">Editor</h2><button class="close" id="closeModal">×</button></div>
+<p class="muted">Changes save in this browser on this device.</p><div id="editor"></div>
+</div></div>
 
-<script src="app.js"></script>
+<script>
+(()=>{
+"use strict";
+const KEY="yoni_original_style_v2";
+const initial={
+settings:{name:"Yoni",logo:"",displayName:"Yoni Member",stars:0,spent:0,referrals:0},
+categories:["All","Trending","New","Chinese","Drama","Premium"],
+collections:[
+{id:"c1",name:"🇨🇳 Chinese",category:"Chinese",image:""},
+{id:"c2",name:"🎭 Drama",category:"Drama",image:""},
+{id:"c3",name:"⭐ Premium",category:"Premium",image:""},
+{id:"c4",name:"🆕 New",category:"New",image:""}
+],
+videos:[
+{id:"v1",title:"Featured Video",category:"Chinese",image:"",link:"",views:98,duration:"5:36",price:0,button:"WATCH",badge:"NEW"},
+{id:"v2",title:"Drama Collection",category:"Drama",image:"",link:"",views:156,duration:"8:21",price:50,button:"UNLOCK",badge:"PREMIUM"},
+{id:"v3",title:"Premium Video",category:"Premium",image:"",link:"",views:75,duration:"6:12",price:25,button:"UNLOCK",badge:"PREMIUM"}
+],
+albums:[
+{id:"a1",name:"Chinese Album",image:"",photos:[{id:"p1",title:"Photo 1",image:"",link:""},{id:"p2",title:"Photo 2",image:"",link:""}]},
+{id:"a2",name:"Drama Album",image:"",photos:[{id:"p3",title:"Photo 1",image:"",link:""}]},
+{id:"a3",name:"Premium Album",image:"",photos:[{id:"p4",title:"Premium Photo",image:"",link:""}]}
+],
+saved:[],history:[]
+};
+let data;
+try{const s=localStorage.getItem(KEY);if(s){const d=JSON.parse(s);data={...structuredClone(initial),...d,settings:{...initial.settings,...(d.settings||{})}};}else data=structuredClone(initial);}catch(e){data=structuredClone(initial);}
+let page="home",category="All",query="",activeAlbum=null,editorMode="videos";
+const $=id=>document.getElementById(id);
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>"i"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const validURL=x=>/^https?:\/\/\S+$/i.test(String(x||""));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){alert("Browser storage is full. Export a backup.");}}
+function image(url,title,portrait=false){
+const cls=portrait?"photo-placeholder":"thumbnail-placeholder";
+return validURL(url)?`<img src="${esc(url)}" alt="${esc(title)}" loading="lazy" onerror="this.outerHTML='<div class=\\'${cls}\\'>🖼️</div>'">`:`<div class="${cls}">🖼️</div>`;
+}
+function renderBanner(){
+$("brand").textContent=data.settings.name||"Yoni";
+$("balance").textContent="⭐ "+(Number(data.settings.stars)||0);
+$("banner").innerHTML=validURL(data.settings.logo)?`<img src="${esc(data.settings.logo)}" alt="Yoni logo">`:`<div class="logo-placeholder"><strong>${esc(data.settings.name||"Yoni")}</strong><div>YOUR LOGO BANNER</div></div>`;
+}
+function renderCategories(){
+$("categories").innerHTML=data.categories.map(c=>`<button class="category ${category===c?"active":""}" data-category="${esc(c)}">${esc(c)}</button>`).join("");
+}
+function renderCollections(){
+$("collections").innerHTML=data.collections.map(c=>`<button class="collection" data-collection="${esc(c.id)}">${image(c.image,c.name)}<strong>${esc(c.name)}</strong><small>${esc(c.category)}</small></button>`).join("");
+}
+function matches(x){return !query||(String(x.title||x.name)+" "+String(x.category||"")).toLowerCase().includes(query);}
+function listVideos(saved=false){
+let a=data.videos.filter(matches);
+if(saved)return a.filter(v=>data.saved.includes(v.id));
+if(category==="Trending")return a.sort((x,y)=>Number(y.views||0)-Number(x.views||0));
+if(category==="New")return a.filter(v=>(v.badge||"").toLowerCase()==="new");
+if(category!=="All")return a.filter(v=>v.category===category);
+return a;
+}
+function videoCard(v){
+return `<article class="content-card"><div class="thumbnail">${image(v.image,v.title)}${v.badge?`<span class="badge">${esc(v.badge)}</span>`:""}<button class="play" data-play="${esc(v.id)}">▶</button><span class="duration">${esc(v.duration)}</span></div><div class="content-info"><h3>${esc(v.title)}</h3><div class="stats">👁 ${Number(v.views)||0} views · ${esc(v.category)}</div><div class="actions"><button class="action" data-like="${esc(v.id)}">${data.saved.includes(v.id)?"♥ Saved":"♡ Like"}</button><button class="action" data-share="${esc(v.id)}">↗ Share</button><button class="action" data-refer="${esc(v.id)}">🎁 Refer</button><button class="action hot" data-play="${esc(v.id)}">${esc(v.button||"WATCH")}${Number(v.price)>0?" ⭐ "+Number(v.price):""}</button></div></div></article>`;
+}
+function renderVideos(){
+const list=listVideos(),saved=listVideos(true);
+$("videos").innerHTML=list.map(videoCard).join("");
+$("savedItems").innerHTML=saved.map(videoCard).join("");
+$("savedEmpty").classList.toggle("hidden",saved.length>0);
+$("feedTitle").textContent=category==="All"?"Trending for you":category;
+$("pStars").textContent=Number(data.settings.stars)||0;
+$("pSaved").textContent=data.saved.length;
+$("pHistory").textContent=data.history.length;
+$("pSpent").textContent=Number(data.settings.spent)||0;
+$("pReferrals").textContent=Number(data.settings.referrals)||0;
+$("empty").classList.toggle("hidden",page==="home"?list.length>0:page==="saved"?saved.length>0:true);
+}
+function renderAlbumGrid(){
+$("albumGrid").innerHTML=data.albums.map(a=>`<button class="photo-card" data-open-album="${esc(a.id)}">${image(a.image,a.name,true)}<strong>${esc(a.name)}</strong><span class="muted">${a.photos.length} photos</span></button>`).join("");
+$("collections").innerHTML=data.collections.map(c=>`<button class="collection" data-collection="${esc(c.id)}">${image(c.image,c.name)}<strong>${esc(c.name)}</strong><small>${esc(c.category)}</small></button>`).join("");
+}
+function renderAlbum(){
+const a=data.albums.find(x=>x.id===activeAlbum);
+$("albumDetail").classList.toggle("hidden",!a);
+$("albumGrid").classList.toggle("hidden",!!a);
+if(!a)return;
+$("albumName").textContent=a.name;
+$("photoCount").textContent=a.photos.length+" photos in this album";
+$("photos").innerHTML=a.photos.map(p=>`<article class="content-card"><div class="thumbnail" style="aspect-ratio:3/4">${image(p.image,p.title,true)}<button class="play" data-open-photo="${esc(p.id)}" data-album="${esc(a.id)}">↗</button></div><div class="content-info"><h3>${esc(p.title)}</h3><div class="actions"><button class="action" data-like="${esc(p.id)}">♡ Like</button><button class="action" data-photo-share="${esc(p.id)}" data-album="${esc(a.id)}">↗ Share</button><button class="action" data-photo-refer="${esc(p.id)}">🎁 Refer</button><button class="action hot" data-open-photo="${esc(p.id)}" data-album="${esc(a.id)}">⭐ Unlock</button></div></div></article>`).join("");
+}
+function renderProfile(){
+$("profileName").textContent=data.settings.displayName||"Yoni Member";
+$("displayName").value=data.settings.displayName||"";
+$("history").innerHTML=data.history.length?data.history.slice(0,20).map(h=>`<div class="stat"><span>${esc(h.title)}</span><small class="muted">${esc(h.date)}</small></div>`).join(""):`<p class="muted">Your viewing history will appear here.</p>`;
+}
+function render(){
+renderBanner();renderCategories();renderCollections();renderVideos();renderAlbumGrid();renderAlbum();renderProfile();
+["home","gallery","saved","profile"].forEach(p=>$(""+p+"Screen").classList.toggle("hidden",page!==p));
+$("categories").classList.toggle("hidden",page!=="home");
+document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+}
+function setPage(p){page=p;render();window.scrollTo({top:0,behavior:"smooth"});}
+async function share(title,url){
+try{if(navigator.share)await navigator.share({title,text:"Check this out on Yoni",url:validURL(url)?url:location.href});else if(navigator.clipboard){await navigator.clipboard.writeText(validURL(url)?url:location.href);alert("Link copied.");}else alert(location.href);}catch(e){if(e.name!=="AbortError")alert("Sharing is unavailable.");}
+}
+function openVideo(id){
+const v=data.videos.find(x=>x.id===id);if(!v)return;
+if(Number(v.price)>0){alert("This content requires "+v.price+" Stars. Real Telegram Stars checkout is not connected yet.");return;}
+v.views=Number(v.views||0)+1;data.history.unshift({title:v.title,date:new Date().toLocaleDateString()});data.history=data.history.slice(0,50);save();render();
+if(validURL(v.link)){if(window.Telegram?.WebApp?.openLink)window.Telegram.WebApp.openLink(v.link);else window.open(v.link,"_blank","noopener,noreferrer");}
+else alert("Add the video delivery URL in the editor to enable playback.");
+}
+function openPhoto(id,albumId){
+const a=data.albums.find(x=>x.id===albumId),p=a?.photos.find(x=>x.id===id);if(!p)return;
+data.history.unshift({title:p.title,date:new Date().toLocaleDateString()});data.history=data.history.slice(0,50);save();renderProfile();
+if(validURL(p.link)){if(window.Telegram?.WebApp?.openLink)window.Telegram.WebApp.openLink(p.link);else window.open(p.link,"_blank","noopener,noreferrer");}
+else if(validURL(p.image))window.open(p.image,"_blank","noopener,noreferrer");
+else alert("Add a photo or delivery URL in the editor.");
+}
+document.addEventListener("click",async e=>{
+const b=e.target.closest("button");if(!b)return;
+if(b.dataset.page){setPage(b.dataset.page);return;}
+if(b.dataset.category){category=b.dataset.category;setPage("home");return;}
+if(b.dataset.collection){
+const c=data.collections.find(x=>x.id===b.dataset.collection);if(c){category=c.category;setPage("home");}return;
+}
+if(b.dataset.openAlbum){activeAlbum=b.dataset.openAlbum;setPage("gallery");return;}
+if(b.id==="backAlbums"){activeAlbum=null;renderAlbum();return;}
+if(b.dataset.play){openVideo(b.dataset.play);return;}
+if(b.dataset.openPhoto){openPhoto(b.dataset.openPhoto,b.dataset.album);return;}
+if(b.dataset.like){
+const id=b.dataset.like;data.saved=data.saved.includes(id)?data.saved.filter(x=>x!==id):[...data.saved,id];save();render();return;
+}
+if(b.dataset.share){const v=data.videos.find(x=>x.id===b.dataset.share);if(v)await share(v.title,v.link);return;}
+if(b.dataset.photoShare){const a=data.albums.find(x=>x.id===b.dataset.album),p=a?.photos.find(x=>x.id===b.dataset.photoShare);if(p)await share(p.title,p.link||p.image);return;}
+if(b.dataset.refer||b.dataset.photoRefer){alert("Real referral tracking needs a Telegram bot/backend integration.");return;}
+if(b.dataset.edit){openEditor(b.dataset.edit);return;}
+if(b.id==="seeAll"){category="All";setPage("home");return;}
+if(b.id==="invite"||b.id==="referral"){await share("Yoni",location.href);return;}
+if(b.id==="openEditor"){openEditor("videos");return;}
+});
+$("search").addEventListener("input",()=>{query=$("search").value.trim().toLowerCase();renderVideos();renderAlbumGrid();});
+$("searchBtn").addEventListener("click",()=>{query=$("search").value.trim().toLowerCase();renderVideos();renderAlbumGrid();});
+$("saveName").addEventListener("click",()=>{data.settings.displayName=$("displayName").value.trim()||"Yoni Member";save();renderProfile();alert("Profile saved on this device.");});
+$("clearHistory").addEventListener("click",()=>{if(confirm("Clear viewing history?")){data.history=[];save();render();}});
+$("export").addEventListener("click",()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="yoni-backup.json";a.click();URL.revokeObjectURL(url);});
+$("import").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.settings||!Array.isArray(d.videos)||!Array.isArray(d.albums))throw Error();if(confirm("Replace current app data?")){data=d;save();render();}}catch{alert("Invalid backup file.");}e.target.value="";});
 
+function field(label,key,value,type="text"){return `<label class="label">${esc(label)}</label><input class="field" data-field="${key}" type="${type}" value="${esc(value??"")}">`;}
+function area(label,key,value){return `<label class="label">${esc(label)}</label><textarea class="field" data-field="${key}">${esc(value??"")}</textarea>`;}
+function openEditor(mode){editorMode=mode||"videos";$("modal").classList.remove("hidden");drawEditor();}
+function tabs(){return `<div class="categories"><button class="category" data-tab="videos">Videos</button><button class="category" data-tab="collections">Collections</button><button class="category" data-tab="albums">Albums</button><button class="category" data-tab="photos">Photos</button><button class="category" data-tab="categories">Categories</button><button class="category" data-tab="settings">Brand</button></div>`;}
+function drawEditor(){
+let h=tabs();
+if(editorMode==="videos"){
+h+=`<button class="form-button" data-add="videos">+ Add video</button>`;
+h+=data.videos.map(v=>`<div class="editor-row"><strong>${esc(v.title)}</strong><br><button class="form-button" data-edit-item="videos" data-id="${esc(v.id)}">Edit</button><button class="form-button danger" data-delete="videos" data-id="${esc(v.id)}">Delete</button></div>`).join("");
+}else if(editorMode==="collections"){
+h+=`<button class="form-button" data-add="collections">+ Add collection</button>`;
+h+=data.collections.map(v=>`<div class="editor-row">${esc(v.name)}<br><button class="form-button" data-edit-item="collections" data-id="${esc(v.id)}">Edit</button><button class="form-button danger" data-delete="collections" data-id="${esc(v.id)}">Delete</button></div>`).join("");
+}else if(editorMode==="albums"){
+h+=`<button class="form-button" data-add="albums">+ Add photo album</button>`;
+h+=data.albums.map(v=>`<div class="editor-row">${esc(v.name)} · ${v.photos.length} photos<br><button class="form-button" data-edit-item="albums" data-id="${esc(v.id)}">Edit album</button><button class="form-button" data-manage="${esc(v.id)}">Manage photos</button><button class="form-button danger" data-delete="albums" data-id="${esc(v.id)}">Delete</button></div>`).join("");
+}else if(editorMode==="photos"){
+h+="<p class='muted'>Choose an album below to add, edit or remove its photos.</p>";
+h+=data.albums.map(a=>`<div class="editor-row">${esc(a.name)} · ${a.photos.length} photos<br><button class="form-button" data-manage="${esc(a.id)}">Manage photos</button></div>`).join("");
+}else if(editorMode==="categories"){
+h+=area("One category per line","categoryText",data.categories.join("\n"))+`<button class="form-button" data-save-categories>Save categories</button>`;
+}else{
+h+=field("App name","brand",data.settings.name)+field("Logo/banner image URL","logo",data.settings.logo)+field("Demo Stars balance","stars",data.settings.stars,"number")+`<p class="muted">Demo balance only; it is not real Stars.</p><button class="form-button" data-save-settings>Save brand</button>`;
+}
+$("editor").innerHTML=h;
+}
+function editItem(type,id){
+const item=type==="videos"?data.videos.find(x=>x.id===id):type==="collections"?data.collections.find(x=>x.id===id):data.albums.find(x=>x.id===id);if(!item)return;
+let h="<h3>Edit item</h3>";
+if(type==="videos")h+=field("Title","title",item.title)+field("Category","category",item.category)+field("Thumbnail URL","image",item.image)+field("Video/delivery URL","link",item.link)+field("Views","views",item.views,"number")+field("Duration","duration",item.duration)+field("Demo Stars price","price",item.price,"number")+field("Button label","button",item.button)+field("Badge","badge",item.badge);
+else if(type==="collections")h+=field("Collection name","name",item.name)+field("Category opened","category",item.category)+field("Landscape cover URL","image",item.image);
+else h+=field("Album name","name",item.name)+field("Landscape cover URL","image",item.image);
+h+=`<button class="form-button" data-save-item="${type}" data-id="${esc(id)}">Save</button><button class="form-button" data-back>Back</button>`;
+$("editor").innerHTML=h;
+}
+function managePhotos(albumId){
+const a=data.albums.find(x=>x.id===albumId);if(!a)return;
+let h=`<h3>${esc(a.name)} · ${a.photos.length} photos</h3><button class="form-button" data-add-photo="${esc(a.id)}">+ Add photo</button>`;
+h+=a.photos.map(p=>`<div class="editor-row">${esc(p.title)}<br><button class="form-button" data-edit-photo="${esc(a.id)}" data-id="${esc(p.id)}">Edit</button><button class="form-button danger" data-delete-photo="${esc(a.id)}" data-id="${esc(p.id)}">Delete</button></div>`).join("");
+h+=`<button class="form-button" data-tab="albums">Back</button>`;$("editor").innerHTML=h;
+}
+function editPhoto(aid,pid){
+const a=data.albums.find(x=>x.id===aid);if(!a)return;
+let p=a.photos.find(x=>x.id===pid);if(!p){p={id:uid(),title:"New photo",image:"",link:""};a.photos.push(p);save();}
+$("editor").innerHTML=`<h3>Edit photo</h3>${field("Photo title","title",p.title)}${field("Image URL","image",p.image)}${field("Photo/video delivery URL","link",p.link)}<button class="form-button" data-save-photo="${esc(aid)}" data-id="${esc(p.id)}">Save photo</button><button class="form-button" data-manage="${esc(aid)}">Back</button>`;
+}
+function addItem(type){
+let x=type==="videos"?{id:uid(),title:"New video",category:"All",image:"",link:"",views:0,duration:"",price:0,button:"WATCH",badge:""}:type==="collections"?{id:uid(),name:"New collection",category:"All",image:""}:{id:uid(),name:"New album",image:"",photos:[]};
+data[type].push(x);save();editItem(type,x.id);
+}
+$("editor").addEventListener("click",e=>{
+const b=e.target.closest("button");if(!b)return;
+if(b.dataset.tab){editorMode=b.dataset.tab;drawEditor();return;}
+if(b.dataset.add){addItem(b.dataset.add);return;}
+if(b.dataset.editItem){editItem(b.dataset.editItem,b.dataset.id);return;}
+if(b.dataset.manage){managePhotos(b.dataset.manage);return;}
+if(b.dataset.addPhoto){editPhoto(b.dataset.addPhoto,null);return;}
+if(b.dataset.editPhoto){editPhoto(b.dataset.editPhoto,b.dataset.id);return;}
+if(b.dataset.deletePhoto){const a=data.albums.find(x=>x.id===b.dataset.deletePhoto);if(a&&confirm("Delete this photo?")){a.photos=a.photos.filter(p=>p.id!==b.dataset.id);save();managePhotos(a.id);render();}return;}
+if(b.dataset.savePhoto){const a=data.albums.find(x=>x.id===b.dataset.savePhoto),p=a?.photos.find(x=>x.id===b.dataset.id);if(!p)return;$("editor").querySelectorAll("[data-field]").forEach(el=>p[el.dataset.field]=el.value.trim());save();managePhotos(a.id);render();return;}
+if(b.dataset.delete){const t=b.dataset.delete,id=b.dataset.id;if(confirm("Delete this item?")){data[t]=data[t].filter(x=>x.id!==id);save();drawEditor();render();}return;}
+if(b.hasAttribute("data-save-categories")){const n=[...new Set($("[data-field='categoryText']").value.split("\n").map(x=>x.trim()).filter(Boolean))];data.categories=n.includes("All")?n:["All",...n];category="All";save();drawEditor();render();return;}
+if(b.hasAttribute("data-save-settings")){data.settings.name=$("[data-field='brand']").value.trim()||"Yoni";data.settings.logo=$("[data-field='logo']").value.trim();data.settings.stars=Math.max(0,Number($("[data-field='stars']").value)||0);save();drawEditor();render();return;}
+if(b.dataset.saveItem){const type=b.dataset.saveItem,item=data[type].find(x=>x.id===b.dataset.id);if(!item)return;$("editor").querySelectorAll("[data-field]").forEach(el=>{const k=el.dataset.field;item[k]=["views","price"].includes(k)?Math.max(0,Number(el.value)||0):el.value.trim();});save();drawEditor();render();return;}
+if(b.hasAttribute("data-back")){drawEditor();return;}
+});
+$("closeModal").addEventListener("click",()=>$("modal").classList.add("hidden"));
+render();
+})();
+</script>
 </body>
 </html>
