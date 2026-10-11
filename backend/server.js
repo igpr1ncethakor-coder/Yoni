@@ -1,21 +1,16 @@
+
 const express = require("express");
 const TelegramBot = require("node-telegram-bot-api");
 
 const app = express();
-
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const ADMIN_ID = process.env.ADMIN_ID;
 
-if (!BOT_TOKEN) {
-    console.error("BOT_TOKEN is missing.");
-    process.exit(1);
-}
-
-if (!ADMIN_ID) {
-    console.error("ADMIN_ID is missing.");
+if (!BOT_TOKEN || !ADMIN_ID) {
+    console.error("BOT_TOKEN and ADMIN_ID are required.");
     process.exit(1);
 }
 
@@ -24,7 +19,6 @@ const bot = new TelegramBot(BOT_TOKEN, {
 });
 
 const videos = [];
-
 const userStates = {};
 
 app.get("/", (req, res) => {
@@ -34,265 +28,282 @@ app.get("/", (req, res) => {
     });
 });
 
+// Public catalog: never expose private Telegram file IDs.
 app.get("/api/videos", (req, res) => {
-    res.json(videos);
+    res.set("Cache-Control", "no-store");
+    res.json(videos.map(video => ({
+        id: video.id,
+        title: video.title,
+        description: video.description,
+        unlock: video.unlock,
+        thumbnailUrl: video.thumbnailFileId
+            ? `/api/videos/${encodeURIComponent(video.id)}/thumbnail`
+            : null
+    })));
+});
+
+// Return the thumbnail without revealing the bot token.
+app.get("/api/videos/:id/thumbnail", async (req, res) => {
+    const video = videos.find(v => v.id === req.params.id);
+
+    if (!video || !video.thumbnailFileId) {
+        return res.status(404).json({
+            error: "Thumbnail not found"
+        });
+    }
+
+    try {
+        const url = await bot.getFileLink(video.thumbnailFileId);
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            return res.status(502).json({
+                error: "Thumbnail unavailable"
+            });
+        }
+
+        res.set("Content-Type", "image/jpeg");
+        res.set("Cache-Control", "public, max-age=300");
+        res.send(Buffer.from(await response.arrayBuffer()));
+    } catch (error) {
+        console.error("Thumbnail error:", error.message);
+        res.status(502).json({
+            error: "Could not load thumbnail"
+        });
+    }
 });
 
 function isAdmin(msg) {
-    return String(msg.from.id) === String(ADMIN_ID);
+    return msg.from &&
+        String(msg.from.id) === String(ADMIN_ID);
 }
 
-bot.onText(/^\/start$/, async (msg) => {
-
+bot.onText(/^\/start$/, async msg => {
     if (!isAdmin(msg)) {
-        await bot.sendMessage(
+        return bot.sendMessage(
             msg.chat.id,
             "Yoni content bot is private."
         );
-        return;
     }
 
-    await bot.sendMessage(
+    bot.sendMessage(
         msg.chat.id,
         "👑 Yoni Admin Panel\n\n" +
-        "Send /addvideo to publish a new video."
+        "Send /addvideo to publish a video.\n" +
+        "Send /cancel to cancel."
     );
 });
 
-bot.onText(/^\/addvideo$/, async (msg) => {
+bot.onText(/^\/cancel$/, msg => {
+    if (!isAdmin(msg)) return;
 
+    delete userStates[msg.from.id];
+
+    bot.sendMessage(msg.chat.id, "Cancelled.");
+});
+
+bot.onText(/^\/addvideo$/, msg => {
     if (!isAdmin(msg)) return;
 
     userStates[msg.from.id] = {
         step: "waiting_video"
     };
 
-    await bot.sendMessage(
+    bot.sendMessage(
         msg.chat.id,
-        "🎬 Send me the video you want to publish."
+        "🎬 Send a video, or forward a video from your private channel."
     );
 });
 
-bot.on("video", async (msg) => {
-
+bot.on("video", async msg => {
     if (!isAdmin(msg)) return;
 
     const state = userStates[msg.from.id];
 
-    if (!state || state.step !== "waiting_video") {
-        return;
-    }
+    if (!state || state.step !== "waiting_video") return;
 
     state.videoFileId = msg.video.file_id;
     state.step = "waiting_title";
 
     await bot.sendMessage(
         msg.chat.id,
-        "✅ Video received.\n\n" +
-        "Now send the video title."
+        "✅ Video received.\n\nSend the title."
     );
 });
 
-bot.on("message", async (msg) => {
-
+bot.on("photo", async msg => {
     if (!isAdmin(msg)) return;
 
-    if (!msg.text) return;
+    const state = userStates[msg.from.id];
 
-    if (
-        msg.text.startsWith("/") ||
-        msg.text === "FREE" ||
-        msg.text === "REFERRALS" ||
-        msg.text === "STARS"
-    ) {
-        return;
-    }
+    if (!state || state.step !== "waiting_thumbnail") return;
 
+    const photos = msg.photo || [];
+    if (!photos.length) return;
+
+    state.thumbnailFileId =
+        photos[photos.length - 1].file_id;
+
+    state.step = "waiting_unlock";
+
+    await bot.sendMessage(
+        msg.chat.id,
+        "🖼️ Thumbnail received!\n\n" +
+        "Choose unlock method:\nFREE\nREFERRALS\nSTARS"
+    );
+});
+
+bot.on("message", async msg => {
+    if (!isAdmin(msg) || !msg.text) return;
+
+    const text = msg.text.trim();
     const state = userStates[msg.from.id];
 
     if (!state) return;
 
-    if (state.step === "waiting_title") {
+    if (text.startsWith("/") &&
+        !(state.step === "waiting_thumbnail" &&
+          text.toLowerCase() === "/skip")) {
+        return;
+    }
 
-        state.title = msg.text;
+    if (state.step === "waiting_title") {
+        state.title = text.slice(0, 200);
         state.step = "waiting_description";
 
-        await bot.sendMessage(
+        return bot.sendMessage(
             msg.chat.id,
-            "📝 Send a description for this video."
+            "📝 Send a description."
         );
-
-        return;
     }
 
     if (state.step === "waiting_description") {
+        state.description = text.slice(0, 1000);
+        state.step = "waiting_thumbnail";
 
-        state.description = msg.text;
+        return bot.sendMessage(
+            msg.chat.id,
+            "🖼️ Send a thumbnail photo, or /skip."
+        );
+    }
+
+    if (state.step === "waiting_thumbnail" &&
+        text.toLowerCase() === "/skip") {
+        state.thumbnailFileId = null;
         state.step = "waiting_unlock";
 
-        await bot.sendMessage(
+        return bot.sendMessage(
             msg.chat.id,
-            "🔐 Choose the unlock method:\n\n" +
-            "Send exactly one of these:\n\n" +
-            "FREE\n" +
-            "REFERRALS\n" +
-            "STARS"
+            "Choose unlock method:\nFREE\nREFERRALS\nSTARS"
         );
+    }
 
-        return;
+    if (state.step === "waiting_unlock") {
+        const choice = text.toUpperCase();
+
+        if (choice === "FREE") {
+            publishVideo(msg.chat.id, state, {
+                type: "free"
+            });
+            delete userStates[msg.from.id];
+            return;
+        }
+
+        if (choice === "REFERRALS") {
+            state.step = "waiting_referrals";
+
+            return bot.sendMessage(
+                msg.chat.id,
+                "🔗 How many successful referrals are required?"
+            );
+        }
+
+        if (choice === "STARS") {
+            state.step = "waiting_price";
+
+            return bot.sendMessage(
+                msg.chat.id,
+                "⭐ Enter a whole-number Stars price."
+            );
+        }
+
+        return bot.sendMessage(
+            msg.chat.id,
+            "Send FREE, REFERRALS, or STARS."
+        );
     }
 
     if (state.step === "waiting_price") {
+        const price = Number(text);
 
-        const price = Number(msg.text);
-
-        if (!Number.isInteger(price) || price <= 0) {
-
-            await bot.sendMessage(
+        if (!Number.isSafeInteger(price) || price <= 0) {
+            return bot.sendMessage(
                 msg.chat.id,
-                "❌ Please enter a valid whole-number Stars price."
+                "Enter a positive whole-number price."
             );
-
-            return;
         }
 
         publishVideo(msg.chat.id, state, {
             type: "stars",
-            price: price
+            price
         });
 
         delete userStates[msg.from.id];
-
         return;
     }
 
     if (state.step === "waiting_referrals") {
+        const required = Number(text);
 
-        const referrals = Number(msg.text);
-
-        if (
-            !Number.isInteger(referrals) ||
-            referrals < 1
-        ) {
-
-            await bot.sendMessage(
+        if (!Number.isSafeInteger(required) || required < 1) {
+            return bot.sendMessage(
                 msg.chat.id,
-                "❌ Enter a valid referral number."
+                "Enter a positive referral count."
             );
-
-            return;
         }
 
         publishVideo(msg.chat.id, state, {
             type: "referrals",
-            required: referrals
+            required
         });
 
         delete userStates[msg.from.id];
-
-        return;
     }
-});
-
-bot.on("message", async (msg) => {
-
-    if (!isAdmin(msg)) return;
-
-    const state = userStates[msg.from.id];
-
-    if (!state || !msg.text) return;
-
-    if (state.step !== "waiting_unlock") {
-        return;
-    }
-
-    const choice = msg.text.toUpperCase();
-
-    if (choice === "FREE") {
-
-        publishVideo(msg.chat.id, state, {
-            type: "free"
-        });
-
-        delete userStates[msg.from.id];
-
-        return;
-    }
-
-    if (choice === "REFERRALS") {
-
-        state.step = "waiting_referrals";
-
-        await bot.sendMessage(
-            msg.chat.id,
-            "🔗 How many successful referrals are required?\n\n" +
-            "Example: 3"
-        );
-
-        return;
-    }
-
-    if (choice === "STARS") {
-
-        state.step = "waiting_price";
-
-        await bot.sendMessage(
-            msg.chat.id,
-            "⭐ Enter the Stars price.\n\n" +
-            "Example: 10, 16, 22, 50"
-        );
-
-        return;
-    }
-
-    await bot.sendMessage(
-        msg.chat.id,
-        "❌ Please send FREE, REFERRALS, or STARS."
-    );
 });
 
 function publishVideo(chatId, state, unlock) {
-
     const video = {
         id: Date.now().toString(),
         telegramFileId: state.videoFileId,
+        thumbnailFileId: state.thumbnailFileId || null,
         title: state.title,
         description: state.description,
-        unlock: unlock,
+        unlock,
         createdAt: new Date().toISOString()
     };
 
-    videos.push(video);
+    videos.unshift(video);
 
     let unlockText = "🆓 FREE";
 
     if (unlock.type === "referrals") {
-        unlockText =
-            "🔗 " +
-            unlock.required +
-            " referrals";
+        unlockText = `🔗 ${unlock.required} referrals`;
     }
 
     if (unlock.type === "stars") {
-        unlockText =
-            "⭐ " +
-            unlock.price +
-            " Stars";
+        unlockText = `⭐ ${unlock.price} Stars`;
     }
 
     bot.sendMessage(
         chatId,
-        "✅ VIDEO PUBLISHED\n\n" +
-        "🎬 " + video.title + "\n" +
-        "🔐 " + unlockText + "\n\n" +
-        "The video is now available to the Yoni app."
+        "✅ VIDEO ADDED TO YONI CATALOG\n\n" +
+        `🎬 ${video.title}\n` +
+        `🔐 ${unlockText}\n\n` +
+        "Note: the catalog resets when the server restarts. " +
+        "Secure Watch delivery is not connected yet."
     );
 }
 
 app.listen(PORT, () => {
-
-    console.log(
-        `Yoni backend running on port ${PORT}`
-    );
-
+    console.log(`Yoni backend running on port ${PORT}`);
 });
