@@ -1,281 +1,186 @@
+(() => {
+  "use strict";
 
-const videos = [
-  {
-    id: 1,
-    title: "Featured Video",
-    category: "Chinese",
-    views: 98,
-    duration: "5:36",
-    badge: "NEW",
-    price: 0
-  },
-  {
-    id: 2,
-    title: "Drama Collection",
-    category: "Drama",
-    views: 156,
-    duration: "8:21",
-    badge: "PREMIUM",
-    price: 50
-  },
-  {
-    id: 3,
-    title: "Premium Video",
-    category: "Premium",
-    views: 75,
-    duration: "6:12",
-    badge: "PREMIUM",
-    price: 25
-  },
-  {
-    id: 4,
-    title: "Trending Video",
-    category: "Chinese",
-    views: 240,
-    duration: "4:45",
-    badge: "TRENDING",
-    price: 0
+  // IMPORTANT: Set this to your deployed backend's HTTPS base URL, with no trailing slash.
+  // Example: const API_BASE = "https://your-yoni-backend.example.com";
+  const API_BASE = "https://YOUR-BACKEND-URL";
+  const BOT_USERNAME = "Yonimargbot";
+  const BOT_LINK = `https://t.me/${BOT_USERNAME}`;
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+  const $ = id => document.getElementById(id);
+  const state = { videos: [], category: "All", query: "", page: "homePage", saved: new Set(readSaved()) };
+
+  function readSaved() {
+    try { return JSON.parse(localStorage.getItem("yoni_saved_codes") || "[]"); } catch (_) { return []; }
   }
-];
-
-const categories = [
-  "All", "Trending", "New", "Chinese", "Drama", "Premium"
-];
-
-const collections = [
-  { title: "🇨🇳 Chinese", category: "Chinese" },
-  { title: "🎭 Drama", category: "Drama" },
-  { title: "⭐ Premium", category: "Premium" },
-  { title: "🔥 Trending", category: "Trending" },
-  { title: "🆕 New", category: "New" }
-];
-
-const likedVideos = new Set();
-let currentCategory = "All";
-let currentPage = "home";
-let searchTerm = "";
-
-const $ = id => document.getElementById(id);
-
-function safe(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
-}
-
-function renderCategories() {
-  const box = $("categories");
-  if (!box) return;
-
-  box.innerHTML = categories.map(category => `
-    <button class="category-chip ${
-      currentCategory === category ? "active" : ""
-    }" data-category="${safe(category)}">
-      ${safe(category)}
-    </button>
-  `).join("");
-}
-
-function renderCollections() {
-  const box = $("collections");
-  if (!box) return;
-
-  box.innerHTML = collections.map(item => `
-    <button class="collection-card"
-      data-collection="${safe(item.category)}">
-      <div class="collection-image">
-        <span>🖼️</span>
-      </div>
-      <span class="collection-name">${safe(item.title)}</span>
-    </button>
-  `).join("");
-}
-
-function getVideos() {
-  let result = [...videos];
-
-  if (searchTerm) {
-    result = result.filter(video =>
-      video.title.toLowerCase().includes(searchTerm) ||
-      video.category.toLowerCase().includes(searchTerm)
-    );
+  function saveSaved() {
+    try { localStorage.setItem("yoni_saved_codes", JSON.stringify([...state.saved])); } catch (_) {}
   }
-
-  if (currentPage === "liked") {
-    result = result.filter(video => likedVideos.has(video.id));
-  } else if (currentPage === "trending" ||
-             currentCategory === "Trending") {
-    result.sort((a, b) => b.views - a.views);
-  } else if (currentPage === "profile") {
-    return [];
-  } else if (currentCategory === "New") {
-    result = result.filter(video => video.badge === "NEW");
-  } else if (currentCategory !== "All") {
-    result = result.filter(video =>
-      video.category === currentCategory
-    );
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
   }
-
-  return result;
-}
-
-function renderVideos() {
-  const box = $("videoFeed");
-  const empty = $("emptyMessage");
-  if (!box) return;
-
-  const list = getVideos();
-
-  box.innerHTML = list.map(video => `
-    <article class="content-card">
-      <div class="video-thumbnail thumbnail-one">
-        <span class="video-badge">${safe(video.badge)}</span>
-        <button class="play-button"
-          data-play="${video.id}" aria-label="Play video">▶</button>
-        <span class="video-duration">${safe(video.duration)}</span>
-      </div>
-
-      <div class="content-info">
-        <h3>${safe(video.title)}</h3>
-        <p>${safe(video.category)}</p>
-
-        <div class="stats">
-          <span>👁 ${video.views} views</span>
-          <span>${safe(video.duration)}</span>
-        </div>
-
-        <div class="video-actions">
-          <button class="video-action"
-            data-like="${video.id}">
-            ${likedVideos.has(video.id) ? "❤️ Saved" : "♡ Save"}
-          </button>
-
-          <button class="video-action"
-            data-open="${video.id}">
-            ${video.price > 0
-              ? `⭐ ${video.price} Stars`
-              : "▶ Watch"}
-          </button>
-        </div>
-      </div>
-    </article>
-  `).join("");
-
-  if (empty) empty.hidden = list.length > 0;
-
-  const title = $("feedTitle");
-  if (title) {
-    title.textContent = currentPage === "liked"
-      ? "Saved videos"
-      : currentPage === "profile"
-      ? "Profile"
-      : currentPage === "trending" ||
-        currentCategory === "Trending"
-      ? "Trending for you"
-      : currentCategory === "All"
-      ? "Videos for you"
-      : currentCategory;
+  function normalizeVideo(v, index) {
+    const code = String(v.code || v.id || `VIDEO-${index + 1}`);
+    return {
+      ...v,
+      code,
+      title: String(v.title || `Video ${code}`),
+      description: String(v.description || ""),
+      category: String(v.category || "All"),
+      badge: String(v.badge || (Number(v.priceStars || v.price || 0) > 0 ? "PREMIUM" : "NEW")),
+      views: Number(v.views || v.appViews || 0),
+      duration: String(v.duration || ""),
+      price: Number(v.priceStars ?? v.price ?? 0),
+      thumbnail: String(v.thumbnailUrl || v.thumbnail || v.image || "")
+    };
   }
-}
-
-function render() {
-  renderCategories();
-  renderCollections();
-  renderVideos();
-}
-
-document.addEventListener("click", event => {
-  const categoryButton = event.target.closest("[data-category]");
-  const collectionButton = event.target.closest("[data-collection]");
-  const likeButton = event.target.closest("[data-like]");
-  const playButton = event.target.closest("[data-play]");
-  const openButton = event.target.closest("[data-open]");
-  const navButton = event.target.closest("[data-page]");
-
-  if (categoryButton) {
-    currentCategory = categoryButton.dataset.category;
-    currentPage = "home";
-    render();
+  function videoLink(video) {
+    // The current backend supports /start V001 deep links. Telegram requires users to start the bot once.
+    return `${BOT_LINK}?start=${encodeURIComponent(video.code)}`;
   }
-
-  if (collectionButton) {
-    currentCategory = collectionButton.dataset.collection;
-    currentPage = "home";
-    render();
-    $("feedTitle")?.scrollIntoView({ behavior: "smooth" });
+  function openLink(url) {
+    if (tg && typeof tg.openTelegramLink === "function" && url.startsWith("https://t.me/")) tg.openTelegramLink(url);
+    else window.open(url, "_blank", "noopener,noreferrer");
   }
-
-  if (likeButton) {
-    const id = Number(likeButton.dataset.like);
-    likedVideos.has(id)
-      ? likedVideos.delete(id)
-      : likedVideos.add(id);
-    renderVideos();
+  function notify(message) {
+    if (tg && typeof tg.showAlert === "function") tg.showAlert(message);
+    else window.alert(message);
   }
+  function setNotice(message) {
+    const box = $("connectionNotice");
+    box.textContent = message;
+    box.classList.add("show");
+  }
+  function clearNotice() { $("connectionNotice").classList.remove("show"); }
 
-  if (playButton || openButton) {
-    const id = Number(
-      (playButton || openButton).dataset.play ??
-      (playButton || openButton).dataset.open
-    );
-    const video = videos.find(item => item.id === id);
-
-    if (video) {
-      alert(video.price > 0
-        ? `${video.title}: Stars payment is not connected yet.`
-        : `${video.title}: Add your video delivery link to enable playback.`);
+  async function loadVideos() {
+    $("catalogStatus").textContent = "Connecting…";
+    if (!API_BASE || API_BASE.includes("YOUR-BACKEND-URL")) {
+      state.videos = [];
+      $("catalogStatus").textContent = "Setup needed";
+      setNotice("The frontend is ready, but the backend address has not been configured yet. Set API_BASE in this file to your deployed backend HTTPS URL.");
+      render();
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE}/api/videos`, { headers: { "Accept": "application/json" }, cache: "no-store" });
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      const data = await response.json();
+      const items = Array.isArray(data) ? data : (Array.isArray(data.videos) ? data.videos : []);
+      state.videos = items.map(normalizeVideo);
+      $("catalogStatus").textContent = "Live catalogue";
+      clearNotice();
+      render();
+    } catch (err) {
+      $("catalogStatus").textContent = "Offline";
+      setNotice("Could not load videos from the backend. Check the backend URL, server status and CORS settings. " + err.message);
+      render();
     }
   }
 
-  if (navButton) {
-    currentPage = navButton.dataset.page;
-    currentCategory = "All";
-
-    document.querySelectorAll(".nav-item").forEach(button => {
-      button.classList.toggle("active", button === navButton);
-    });
-
-    render();
+  function filteredVideos() {
+    let items = state.videos.filter(v => state.category === "All" || v.category.toLowerCase() === state.category.toLowerCase());
+    if (state.query) {
+      const q = state.query.toLowerCase();
+      items = items.filter(v => `${v.title} ${v.description} ${v.category} ${v.code}`.toLowerCase().includes(q));
+    }
+    if (state.page === "savedPage") items = items.filter(v => state.saved.has(v.code));
+    if (state.category === "Trending") items = [...items].sort((a,b) => b.views - a.views);
+    return items;
   }
-});
+  function renderCategories() {
+    const categories = ["All", ...new Set(state.videos.map(v => v.category).filter(c => c && c.toLowerCase() !== "all"))];
+    if (!categories.includes("Trending")) categories.splice(1, 0, "Trending");
+    $("categoryChips").innerHTML = categories.map(c => `<button class="chip ${state.category === c ? "active" : ""}" data-category="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join("");
+  }
+  function cardHTML(v) {
+    const isSaved = state.saved.has(v.code);
+    const thumb = v.thumbnail
+      ? `<img src="${escapeHTML(v.thumbnail)}" alt="" loading="lazy" onerror="this.remove();this.parentElement.insertAdjacentHTML('afterbegin','<span class=&quot;placeholder&quot;>▶</span>')">`
+      : `<span class="placeholder">▶</span>`;
+    return `<article class="card">
+      <div class="thumb">${thumb}<span class="badge">${escapeHTML(v.badge)}</span>${v.duration ? `<span class="duration">${escapeHTML(v.duration)}</span>` : ""}</div>
+      <div class="card-body"><h3 title="${escapeHTML(v.title)}">${escapeHTML(v.title)}</h3>
+      <div class="meta"><span>${escapeHTML(v.category)}</span><span>•</span><span>${v.views.toLocaleString()} views</span></div>
+      <div class="card-actions"><button class="primary" data-watch="${escapeHTML(v.code)}">${v.price > 0 ? `⭐ ${v.price} Stars` : "▶ Watch"}</button><button class="secondary" data-save="${escapeHTML(v.code)}" aria-label="${isSaved ? "Remove saved video" : "Save video"}">${isSaved ? "♥" : "♡"}</button></div></div></article>`;
+  }
+  function renderGrid(target, items, emptyTitle, emptyText) {
+    $(target).innerHTML = items.length ? items.map(cardHTML).join("") : `<div class="empty"><b>${escapeHTML(emptyTitle)}</b>${escapeHTML(emptyText)}</div>`;
+  }
+  function render() {
+    renderCategories();
+    const videos = filteredVideos();
+    $("feedTitle").textContent = state.category === "All" ? "Videos for you" : state.category === "Trending" ? "Trending for you" : state.category;
+    $("videoCount").textContent = `${videos.length} video${videos.length === 1 ? "" : "s"}`;
+    renderGrid("videoGrid", videos, "No videos found", state.videos.length ? "Try another search or category." : "Once the backend is connected and videos are registered, they will appear here.");
+    renderGrid("savedGrid", state.videos.filter(v => state.saved.has(v.code)), "Nothing saved yet", "Tap the ♡ button on a video to save it on this device.");
+  }
+  function switchPage(page) {
+    state.page = page;
+    document.querySelectorAll(".page").forEach(el => el.classList.toggle("active", el.id === page));
+    document.querySelectorAll(".nav button").forEach(el => el.classList.toggle("active", el.dataset.page === page));
+    if (page === "savedPage") render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
-$("searchInput")?.addEventListener("input", event => {
-  searchTerm = event.target.value.trim().toLowerCase();
-  renderVideos();
-});
-
-$("searchButton")?.addEventListener("click", () => {
-  searchTerm = ($("searchInput")?.value || "").trim().toLowerCase();
-  renderVideos();
-});
-
-$("inviteButton")?.addEventListener("click", async () => {
-  const shareData = {
-    title: "Yoni",
-    text: "Check out Yoni!"
-  };
-
-  try {
+  document.addEventListener("click", event => {
+    const category = event.target.closest("[data-category]");
+    const watch = event.target.closest("[data-watch]");
+    const save = event.target.closest("[data-save]");
+    const nav = event.target.closest("[data-page]");
+    if (category) {
+      state.category = category.dataset.category;
+      state.page = "homePage";
+      switchPage("homePage");
+      render();
+    }
+    if (watch) {
+      const video = state.videos.find(v => v.code === watch.dataset.watch);
+      if (video) openLink(videoLink(video));
+    }
+    if (save) {
+      const code = save.dataset.save;
+      if (state.saved.has(code)) state.saved.delete(code); else state.saved.add(code);
+      saveSaved();
+      render();
+    }
+    if (nav) switchPage(nav.dataset.page);
+  });
+  $("searchInput").addEventListener("input", event => { state.query = event.target.value.trim(); render(); });
+  $("refreshButton").addEventListener("click", loadVideos);
+  $("aboutButton").addEventListener("click", () => notify("Yoni is a Telegram Mini App. Video delivery, paid access and referral rewards depend on the connected Telegram bot and backend."));
+  function inviteLink() {
+    const userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "";
+    return `${BOT_LINK}?start=${userId ? `ref_${userId}` : "invite"}`;
+  }
+  async function shareInvite() {
+    const link = inviteLink();
+    const text = `Check out Yoni: ${link}`;
+    if (tg && typeof tg.switchInlineQuery === "function") {
+      try { await navigator.clipboard.writeText(text); notify("Invite link copied. Share it with friends."); return; } catch (_) {}
+    }
     if (navigator.share) {
-      await navigator.share(shareData);
-    } else {
-      alert("Connect your Telegram invite link here.");
+      try { await navigator.share({ title: "Yoni", text: "Check out Yoni", url: link }); return; } catch (_) {}
     }
-  } catch (error) {
-    if (error.name !== "AbortError") {
-      alert("Sharing is unavailable. Try again.");
+    try { await navigator.clipboard.writeText(link); notify("Invite link copied."); }
+    catch (_) { notify(link); }
+  }
+  $("shareButton").addEventListener("click", shareInvite);
+  $("profileShare").addEventListener("click", shareInvite);
+  $("copyInvite").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(inviteLink()); notify("Invite link copied."); }
+    catch (_) { notify(inviteLink()); }
+  });
+
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
+    if (user) {
+      $("profileName").textContent = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Yoni viewer";
+      $("profileHint").textContent = user.username ? `@${user.username}` : "Signed in through Telegram.";
     }
   }
-});
-
-$("seeAllButton")?.addEventListener("click", () => {
-  currentCategory = "All";
-  currentPage = "home";
-  render();
-});
-
-render();
+  loadVideos();
+})();
