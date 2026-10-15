@@ -3,105 +3,249 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#09040d">
-<title>Yoni</title>
+<meta name="theme-color" content="#130d22">
+<title>Yoni · Discover</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{color-scheme:dark;--bg:#09040d;--panel:#160b1e;--pink:#ff27ad;--purple:#9c39ff;--line:#54255f;--muted:#bcaac5}
-*{box-sizing:border-box}body{margin:0;color:#fff;font:15px system-ui,Arial,sans-serif;background:radial-gradient(ellipse at top,#2a0b32,var(--bg) 58%);min-height:100vh}
-button,input{font:inherit}button{cursor:pointer;color:inherit}.app{max-width:760px;margin:auto;padding:16px 14px 100px}
-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 18px}.brand{font-size:32px;font-weight:950;letter-spacing:-1px;background:linear-gradient(90deg,#ff46bb,#b47aff,#fff0cf);color:transparent;background-clip:text}
-.pill{border:1px solid var(--line);border-radius:24px;padding:10px 13px;background:#180c20}.banner{min-height:112px;border:1px solid #692b70;border-radius:20px;display:grid;place-items:center;text-align:center;background:linear-gradient(130deg,#25102e,#0e0614);margin-bottom:16px;overflow:hidden}.banner img{width:100%;max-height:180px;object-fit:cover}.banner strong{font-size:30px;color:#ff60cb}
-.invite{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-radius:20px;background:linear-gradient(110deg,#ff17a7,#9429ff,#d33da9);margin-bottom:16px}.invite h2{font-size:18px;margin:0 0 5px}.invite p{margin:0;font-size:12px}.invite button,.primary{border:0;border-radius:13px;padding:11px 14px;background:#100713;font-weight:800}
-.search{display:flex;gap:8px;margin:16px 0}.search input{min-width:0;flex:1;padding:14px 16px;border:1px solid var(--line);border-radius:25px;background:#100713;color:white}.search button{border:0;border-radius:50%;width:48px;background:linear-gradient(130deg,var(--pink),var(--purple))}
-.categories,.row{display:flex;gap:9px;overflow:auto;padding:4px 0 12px;scrollbar-width:none}.cat{flex-shrink:0;border:1px solid var(--line);border-radius:24px;padding:9px 13px;background:#170b1e;color:#e7d7ef}.cat.active,.primary{background:linear-gradient(100deg,var(--pink),var(--purple));border:0;color:white}
-.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}.sectionhead h2{font-size:22px;margin:0}.textbtn{border:0;background:none;color:#e6a0ff}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#1b0c24,#0d0611)}.thumb{position:relative;aspect-ratio:16/10;display:grid;place-items:center;background:radial-gradient(circle at 40% 40%,#78226f,#190c26 70%);overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover}.badge{position:absolute;left:8px;top:8px;border-radius:6px;background:#ed179d;padding:4px 7px;font-size:10px;font-weight:900}.cardbody{padding:11px}.card h3{font-size:15px;line-height:1.35;margin:0 0 6px;overflow-wrap:anywhere}.muted{font-size:12px;color:var(--muted)}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}.actions button{flex:1;min-width:70px;border:1px solid #4d235a;border-radius:10px;background:#1b0c23;padding:9px 6px;font-size:12px}.actions .primary{background:linear-gradient(100deg,var(--pink),var(--purple));border:0}
-.panel{padding:16px;margin:14px 0;border:1px solid var(--line);border-radius:17px;background:#13091a}.field{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0b0610;color:#fff}.label{display:block;color:#edbaf0;margin:12px 0 6px;font-size:13px}.stat{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #38203f}.notice{text-align:center;padding:24px 8px;color:var(--muted)}.hidden{display:none!important}
-.nav{position:fixed;z-index:5;bottom:8px;left:50%;transform:translateX(-50%);width:min(700px,calc(100% - 20px));display:grid;grid-template-columns:repeat(4,1fr);padding:7px;background:#0d0614f5;border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(12px)}.nav button{border:0;background:none;color:#a594af;padding:7px 2px;display:grid;gap:3px;justify-items:center}.nav button.active{color:#ff45c3}.nav small{font-size:11px}
-.modal{position:fixed;z-index:10;inset:0;overflow:auto;background:#050207ed;padding:14px}.modalbox{max-width:560px;margin:18px auto;background:#13091a;border:1px solid var(--line);border-radius:18px;padding:16px}.modalhead{display:flex;justify-content:space-between;align-items:center}.modalhead h2{margin:0}.close{background:none;border:0;font-size:28px}.itemrow{padding:12px 0;border-bottom:1px solid #38203f}.btn{padding:10px 13px;margin:8px 6px 0 0;border:0;border-radius:10px;background:linear-gradient(100deg,var(--pink),var(--purple))}.danger{background:#6c1d3c}
-@media(max-width:460px){.grid{grid-template-columns:1fr}.thumb{aspect-ratio:16/9}.invite{padding:13px}.brand{font-size:29px}}
+:root{color-scheme:dark;--bg:#100b1b;--panel:#1a1228;--panel2:#241834;--pink:#ff5ab7;--purple:#a875ff;--muted:#b8aac9;--text:#fff8ff;--line:#ffffff14}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#2a1238 0,#100b1b 48%,#0c0814 100%);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;padding-bottom:88px}
+button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}button:focus-visible,input:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+.wrap{max-width:760px;margin:auto;padding:16px 14px 28px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 18px}.brand{display:flex;align-items:center;gap:10px}.logo{width:43px;height:43px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--pink),var(--purple));font-size:22px;font-weight:900;box-shadow:0 7px 28px #ff5ab733}.brand h1{font-size:21px;line-height:1;margin:0}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.balance{background:#ffffff0d;border:1px solid var(--line);padding:9px 12px;border-radius:14px;font-weight:750;white-space:nowrap}.balance span{color:#ffd76b}
+.hero{position:relative;overflow:hidden;border:1px solid #ffffff16;border-radius:24px;padding:22px 19px;margin-bottom:18px;background:linear-gradient(120deg,#5c1c58,#37205e 58%,#21143b);min-height:156px}.hero:after{content:"✦";position:absolute;right:20px;top:9px;font-size:90px;opacity:.17}.eyebrow{font-size:11px;letter-spacing:1.7px;text-transform:uppercase;color:#ffd6f1;font-weight:800}.hero h2{font-size:26px;line-height:1.12;max-width:270px;margin:8px 0}.hero p{margin:0;color:#f0dff5;max-width:280px;font-size:13px}.search{display:flex;gap:9px;margin:16px 0}.search input{width:100%;min-width:0;background:#ffffff0c;border:1px solid var(--line);border-radius:15px;color:white;padding:13px 15px}.search input::placeholder{color:#a99ab8}.section-head{display:flex;justify-content:space-between;align-items:center;margin:22px 2px 11px}.section-head h2{font-size:17px;margin:0}.section-head small{color:var(--muted)}.chips{display:flex;gap:8px;overflow:auto;padding:1px 0 6px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap;background:#ffffff0c;border:1px solid var(--line);border-radius:999px;padding:8px 13px;color:#dfd1eb;font-size:12px}.chip.active{background:linear-gradient(110deg,#ff5ab7,#9b68ff);border-color:transparent;color:white;font-weight:750}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.card{min-width:0;background:linear-gradient(180deg,#21162e,#181020);border:1px solid var(--line);border-radius:18px;overflow:hidden}.thumb{position:relative;aspect-ratio:3/4;background:linear-gradient(145deg,#49214e,#241738);overflow:hidden;display:grid;place-items:center}.thumb img{width:100%;height:100%;object-fit:cover;display:block}.thumb .placeholder{font-size:38px;opacity:.75}.badge{position:absolute;left:8px;top:8px;border-radius:8px;background:#100b1bd9;padding:5px 7px;font-size:10px;font-weight:800;letter-spacing:.3px}.duration{position:absolute;right:8px;bottom:8px;background:#09060dc9;border-radius:6px;padding:3px 6px;font-size:10px}.card-body{padding:11px}.card h3{font-size:14px;margin:0 0 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.meta{color:var(--muted);font-size:11px;display:flex;gap:7px;flex-wrap:wrap}.card-actions{display:flex;gap:7px;margin-top:11px}.primary,.secondary{border-radius:10px;padding:9px 10px;font-size:12px;font-weight:800}.primary{background:linear-gradient(110deg,#ff5ab7,#9d6aff);flex:1}.secondary{background:#ffffff10;border:1px solid var(--line)}.empty{padding:28px 16px;text-align:center;border:1px dashed #ffffff25;border-radius:18px;color:var(--muted);grid-column:1/-1}.empty b{display:block;color:white;margin-bottom:5px}.notice{display:none;margin:12px 0;padding:11px 13px;border-radius:12px;background:#ffbd6930;color:#ffe0ae;font-size:12px}.notice.show{display:block}.bottom{position:fixed;z-index:5;bottom:0;left:0;right:0;padding:9px 10px calc(9px + env(safe-area-inset-bottom));background:#100b1beF;backdrop-filter:blur(18px);border-top:1px solid var(--line)}.nav{max-width:620px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;color:#a99ab8;padding:6px 2px;font-size:10px}.nav button .ico{font-size:20px;line-height:1.1}.nav button.active{color:#ff8acb}.page{display:none}.pa
+ge.active{display:block}.profilebox{background:#ffffff0a;border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:12px}.profilebox h2{margin:0 0 6px}.profilebox p{color:var(--muted);font-size:13px}.rowbtn{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 2px;background:transparent;border-bottom:1px solid var(--line);text-align:left}.rowbtn:last-child{border-bottom:0}.rowbtn span:last-child{color:var(--muted)}.footer-note{text-align:center;color:#877995;font-size:10px;margin:22px 0 5px}
+@media(min-width:560px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{padding:27px 25px}.hero h2{font-size:30px}}
 </style>
 </head>
 <body>
-<main class="app">
-<header><div class="brand" id="brand">Yoni</div><button class="pill" id="balance">⭐ Stars</button></header>
-<section class="banner" id="banner"><div><strong>Yoni</strong><div class="muted">Discover • Save • Watch</div></div></section>
-<section class="invite"><div><h2>🎁 Invite friends</h2><p>Share the app with your friends.</p></div><button id="invite">INVITE</button></section>
-<div class="search"><input id="search" placeholder="Search videos and categories" autocomplete="off"><button id="searchBtn">⌕</button></div>
-<div class="categories" id="categories"></div>
-<section id="homePage">
-<div class="sectionhead"><h2>Collections</h2><button class="textbtn" id="editCollections">Edit</button></div><div class="row" id="collections"></div>
-<div class="sectionhead"><h2 id="feedTitle">Trending for you</h2><button class="textbtn" id="seeAll">See all</button></div><div class="grid" id="videos"></div><p id="empty" class="notice hidden">No videos found. Register videos by posting them to your configured private Telegram channel.</p>
-</section>
-<section id="savedPage" class="hidden"><div class="sectionhead"><h2>Saved videos</h2></div><div class="grid" id="savedItems"></div><p id="savedEmpty" class="notice">Nothing saved yet.</p></section>
-<section id="profilePage" class="hidden"><div class="sectionhead"><h2>My profile</h2></div><div class="panel"><h3 id="profileName">Yoni Member</h3><label class="label" for="displayName">Display name (this device only)</label><input class="field" id="displayName" placeholder="Your name"><button class="btn" id="saveName">Save</button></div><div class="panel"><div class="stat"><span>Saved videos</span><b id="pSaved">0</b></div><div class="stat"><span>Viewing history</span><b id="pHistory">0</b></div><div class="stat"><span>API connection</span><b id="apiStatus">Not configured</b></div><button class="btn" id="openSettings">Backend settings</button><button class="btn" id="openEditor">Local content editor</button><button class="btn" id="export">Export backup</button><label class="label" for="import">Restore backup</label><input class="field" id="import" type="file" accept=".json,application/json"></div><div class="panel"><h3>Viewing history</h3><div id="history"></div><button class="btn danger" id="clearHistory">Clear history</button></div></section>
-</main>
-<nav class="nav"><button data-page="home" class="active"><span>⌂</span><small>Home</small></button><button data-page="saved"><span>♡</span><small>Saved</small></button><button data-page="profile"><span>♙</span><small>Profile</small></button><button id="navRefresh"><span>↻</span><small>Refresh</small></button></nav>
-<div class="modal hidden" id="modal"><div class="modalbox"><div class="modalhead"><h2 id="modalTitle">Settings</h2><button class="close" id="closeModal">×</button></div><div id="modalContent"></div></div></div>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">Y</div><div><h1>Yoni</h1><small>Discover your next favorite</small></div></div>
+    <div class="balance">⭐ <span id="starsBalance">Stars</span></div>
+  </header>
+
+  <main id="homePage" class="page active">
+    <section class="hero"><div class="eyebrow">Your private collection</div><h2>Find something worth watching.</h2><p>Fresh picks, collections and trending videos in one place.</p></section>
+    <div class="search"><input id="searchInput" type="search" placeholder="Search videos or categories…" autocomplete="off" aria-label="Search videos"></div>
+    <div class="section-head"><h2>Categories</h2><small id="catalogStatus">Loading catalogue…</small></div>
+    <div id="categoryChips" class="chips"></div>
+    <div class="section-head"><h2 id="feedTitle">Trending for you</h2><small id="videoCount"></small></div>
+    <div id="videoGrid" class="grid"><div class="empty"><b>Connecting to the catalogue…</b>Loading videos from the server.</div></div>
+    <div id="connectionNotice" class="notice"></div>
+  </main>
+
+  <main id="savedPage" class="page">
+    <div class="section-head"><h2>♡ Saved videos</h2></div>
+    <div id="savedGrid" class="grid"></div>
+  </main>
+
+  <main id="invitePage" class="page">
+    <section class="hero"><div class="eyebrow">Share the app</div><h2>Invite friends. Earn rewards.</h2><p>Share your personal invite link. Referral rewards must be confirmed by the bot.</p></section>
+    <div class="profilebox"><h2>Invite friends</h2><p>Your invite link opens the Yoni bot. Referral rewards are only credited when the backend confirms a valid referral.</p><button class="primary" id="shareButton" style="width:100%;padding:13px">↗ Share Yoni</button><button class="secondary" id="copyInvite" style="width:100%;margin-top:9px">Copy invite link</button></div>
+  </main>
+
+  <main id="profilePage" class="page">
+    <div class="section-head"><h2>Profile</h2></div>
+    <div class="profilebox"><h2 id="profileName">Yoni viewer</h2><p id="profileHint">Open this app inside Telegram to load your Telegram profile.</p><button class="primary" id="profileShare" style="width:100%">Invite friends</button></div>
+    <div class="profilebox"><button class="rowbtn" id="refreshButton"><span>↻ Refresh video catalogue</span><span>›</span></button><button class="rowbtn" id="aboutButton"><span>About Yoni</span><span>›</span></button></div>
+  </main>
+  <div class="footer-note">Use only content you have the rights and permission to share.</div>
+</div>
+
+<nav class="bottom"><div class="nav">
+  <button class="active" data-page="homePage"><span class="ico">⌂</span>Home</button>
+  <button data-page="savedPage"><span class="ico">♡</span>Saved</button>
+  <button data-page="invitePage"><span class="ico">↗</span>Invite</button>
+  <button data-page="profilePage"><span class="ico">◎</span>Profile</button>
+</div></nav>
+
 <script>
-(()=>{"use strict";
-const STORE="yoni_reviewed_v1";
-const defaults={settings:{name:"Yoni",logo:"",apiBase:"",displayName:"Yoni Member"},categories:["All","Trending","New","Chinese","Drama","Premium"],collections:[{id:"c1",name:"🇨🇳 Chinese",category:"Chinese",image:""},{id:"c2",name:"🎭 Drama",category:"Drama",image:""},{id:"c3",name:"⭐ Premium",category:"Premium",image:""},{id:"c4",name:"🆕 New",category:"New",image:""}],videos:[],saved:[],history:[]};
-let data;try{const raw=JSON.parse(localStorage.getItem(STORE)||"null");data=raw?{...defaults,...raw,settings:{...defaults.settings,...raw.settings}}:structuredClone(defaults)}catch{data=structuredClone(defaults)}
-let page="home",category="All",query="",apiVideos=null;
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const validURL=s=>/^https?:\/\/\S+$/i.test(String(s||""));
-const save=()=>localStorage.setItem(STORE,JSON.stringify(data));
-function currentVideos(){const list=apiVideos===null?data.videos:apiVideos;let v=list.filter(x=>(String(x.title||"")+" "+String(x.category||"")).toLowerCase().includes(query));if(category==="Trending")v.sort((a,b)=>(Number(b.views)||0)-(Number(a.views)||0));else if(category==="New")v=v.filter(x=>String(x.badge||"").toLowerCase()==="new");else if(category!=="All")v=v.filter(x=>x.category===category);return v}
-function img(url,title){return validURL(url)?`<img src="${esc(url)}" alt="${esc(title)}" loading="lazy" referrerpolicy="no-referrer">`:"<span aria-hidden='true'>▶</span>"}
-function render(){
-$("brand").textContent=data.settings.name||"Yoni";$("balance").textContent="⭐ Stars";
-$("banner").innerHTML=validURL(data.settings.logo)?`<img src="${esc(data.settings.logo)}" alt="App logo">`:`<div><strong>${esc(data.settings.name||"Yoni")}</strong><div class="muted">Discover • Save • Watch</div></div>`;
-$("categories").innerHTML=data.categories.map(c=>`<button class="cat ${c===category?"active":""}" data-category="${esc(c)}">${esc(c)}</button>`).join("");
-$("collections").innerHTML=data.collections.map(c=>`<button class="card" style="flex:0 0 140px;padding:8px;text-align:left" data-collection="${esc(c.category)}"><div class="thumb">${img(c.image,c.name)}</div><div class="cardbody"><h3>${esc(c.name)}</h3><span class="muted">${esc(c.category)}</span></div></button>`).join("");
-const videos=currentVideos();$("videos").innerHTML=videos.map(card).join("");$("empty").classList.toggle("hidden",videos.length>0);
-const saved=videosForSaved();$("savedItems").innerHTML=saved.map(card).join("");$("savedEmpty").classList.toggle("hidden",saved.length>0);
-$("feedTitle").textContent=category==="All"?"Trending for you":category;
-$("profileName").textContent=data.settings.displayName||"Yoni Member";$("displayName").value=data.settings.displayName||"";
-$("pSaved").textContent=data.saved.length;$("pHistory").textContent=data.history.length;
-$("history").innerHTML=data.history.length?data.history.slice(0,20).map(h=>`<div class="stat"><span>${esc(h.title)}</span><small class="muted">${esc(h.date)}</small></div>`).join(""):"<p class='muted'>Your viewing history will appear here.</p>";
-["home","saved","profile"].forEach(p=>$(p+"Page").classList.toggle("hidden",page!==p));document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
-}
-function card(v){const id=String(v.id||v.code||"");return `<article class="card"><div class="thumb">${img(v.image||v.thumbnail,v.title)}${v.badge?`<span class="badge">${esc(v.badge)}</span>`:""}</div><div class="cardbody"><h3>${esc(v.title||v.code||"Untitled video")}</h3><div class="muted">${esc(v.category||"All")} · ${Number(v.views||v.appViews||0)} views ${v.code?"· "+esc(v.code):""}</div><div class="actions"><button data-save="${esc(id)}">${data.saved.includes(id)?"♥ Saved":"♡ Save"}</button><button data-share="${esc(id)}">↗ Share</button><button class="primary" data-watch="${esc(id)}">▶ ${Number(v.priceStars||v.price||0)>0?"Premium":"Watch"}${Number(v.priceStars||v.price||0)>0?" · "+Number(v.priceStars||v.price)+" ⭐":""}</button></div></div></article>`}
-function videosForSaved(){const list=apiVideos===null?data.videos:apiVideos;return list.filter(v=>data.saved.includes(String(v.id||v.code||"")))}
-async function refreshCatalog(){const base=String(data.settings.apiBase||"").trim().replace(/\/+$/,"");if(!base){apiVideos=null;$("apiStatus").textContent="Not configured";render();return}try{const r=await fetch(base+"/api/videos",{headers:{"Accept":"application/json"}});if(!r.ok)throw Error("HTTP "+r.status);const list=await r.json();if(!Array.isArray(list))throw Error("Unexpected catalog response");apiVideos=list.map(v=>({...v,id:String(v.code||v.id),image:v.image||v.thumbnail||"",price:Number(v.priceStars||0),badge:v.badge||(v.unlock==="PREMIUM"?"PREMIUM":"")}));$("apiStatus").textContent="Connected · "+list.length;$("apiStatus").style.color="#8ef0b1";render()}catch(e){$("apiStatus").textContent="Connection failed";$("apiStatus").style.color="#ff8f9c";apiVideos=null;render();console.error("Yoni catalog error:",e)}}
-function botLink(v){const code=String(v.code||"");if(!/^V\d+$/i.test(code))return null;return "https://t.me/Yonimargbot?start="+encodeURIComponent(code)}
-function openTelegramLink(url){if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.openTelegramLink(url)}else{location.href=url}}
-function watch(id){const list=apiVideos===null?data.videos:apiVideos;const v=list.find(x=>String(x.id||x.code)===String(id));if(!v)return alert("Video not found. Refresh the catalog.");
-if(Number(v.priceStars||v.price||0)>0)return alert("This is premium content. Real Telegram Stars checkout is not connected yet, so it has not been charged or unlocked.");
-const link=botLink(v);if(!link)return alert("This item is not registered with the Telegram bot yet. Register it by posting the video to the configured private channel, then refresh.");
-data.history.unshift({title:v.title||v.code,date:new Date().toLocaleDateString()});data.history=data.history.slice(0,50);save();render();openTelegramLink(link)}
-async function share(title,url){const link=validURL(url)?url:location.href;try{if(navigator.share)await navigator.share({title:title||"Yoni",text:"Check out this content on Yoni",url:link});else{await navigator.clipboard.writeText(link);alert("Link copied")}}catch(e){if(e.name!=="AbortError")alert("Could not share this link")}}
-function setPage(p){page=p;render();window.scrollTo({top:0,behavior:"smooth"})}
-function openModal(title,html){$("modalTitle").textContent=title;$("modalContent").innerHTML=html;$("modal").classList.remove("hidden")}
-function openSettings(){openModal("Backend settings",`<p class="muted">Paste your publicly reachable HTTPS backend URL. Do not paste your bot token here. A Termux server running only on your phone is not publicly reachable by GitHub Pages unless you expose it through a secure HTTPS tunnel.</p><label class="label">Backend HTTPS URL</label><input class="field" id="apiBaseInput" placeholder="https://your-secure-backend.example" value="${esc(data.settings.apiBase)}"><label class="label">App name</label><input class="field" id="nameInput" value="${esc(data.settings.name)}"><label class="label">Logo image URL (optional)</label><input class="field" id="logoInput" value="${esc(data.settings.logo)}"><button class="btn" id="saveSettings">Save and connect</button><button class="btn" id="testConnection">Test connection</button>`)}
-function editor(){const videos=apiVideos===null?data.videos:apiVideos;openModal("Local content editor",`<p class="muted">This editor changes this device's local demo catalog only. Channel-registered videos and shared metadata must be managed by the backend/bot. Never enter secrets here.</p><button class="btn" id="addLocal">Add local demo item</button><div>${videos.map(v=>`<div class="itemrow"><b>${esc(v.title||v.code)}</b><div class="muted">${esc(v.code||"Local item")}</div></div>`).join("")}</div>`)}
-document.addEventListener("click",async e=>{const b=e.target.closest("button");if(!b)return;
-if(b.dataset.page){setPage(b.dataset.page);return}
-if(b.dataset.category){category=b.dataset.category;setPage("home");return}
-if(b.dataset.collection){category=b.dataset.collection;setPage("home");return}
-if(b.dataset.watch){watch(b.dataset.watch);return}
-if(b.dataset.save){const id=b.dataset.save;data.saved=data.saved.includes(id)?data.saved.filter(x=>x!==id):[...data.saved,id];save();render();return}
-if(b.dataset.share){const v=(apiVideos===null?data.videos:apiVideos).find(x=>String(x.id||x.code)===b.dataset.share);if(v)await share(v.title,botLink(v)||location.href);return}
-if(b.id==="invite"){await share("Yoni",location.href);return}
-if(b.id==="seeAll"){category="All";setPage("home");return}
-if(b.id==="navRefresh"){await refreshCatalog();return}
-if(b.id==="openSettings"){openSettings();return}
-if(b.id==="openEditor"||b.id==="editCollections"){editor();return}
-if(b.id==="closeModal"){$("modal").classList.add("hidden");return}
-if(b.id==="saveSettings"){data.settings.apiBase=$("apiBaseInput").value.trim().replace(/\/+$/,"");data.settings.name=$("nameInput").value.trim()||"Yoni";data.settings.logo=$("logoInput").value.trim();save();$("modal").classList.add("hidden");await refreshCatalog();return}
-if(b.id==="testConnection"){data.settings.apiBase=$("apiBaseInput").value.trim().replace(/\/+$/,"");save();await refreshCatalog();return}
-if(b.id==="addLocal"){const id="local-"+Date.now();data.videos.push({id,title:"New local demo item",category:"All",image:"",price:0,views:0,badge:"DEMO"});save();render();editor();return}
-});
-$("search").addEventListener("input",()=>{query=$("search").value.trim().toLowerCase();render()});$("searchBtn").addEventListener("click",()=>{query=$("search").value.trim().toLowerCase();render()});
-$("saveName").addEventListener("click",()=>{data.settings.displayName=$("displayName").value.trim()||"Yoni Member";save();render()});
-$("clearHistory").addEventListener("click",()=>{if(confirm("Clear viewing history?")){data.history=[];save();render()}});
-$("export").addEventListener("click",()=>{const a=document.createElement("a"),u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.href=u;a.download="yoni-backup.json";a.click();URL.revokeObjectURL(u)});
-$("import").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.settings||!Array.isArray(d.videos)||!Array.isArray(d.categories))throw Error();if(confirm("Replace local settings and saved data?")){data={...defaults,...d,settings:{...defaults.settings,...d.settings}};save();await refreshCatalog()}}catch{alert("Invalid backup file")}e.target.value=""});
-$("closeModal").addEventListener("click",()=>$("modal").classList.add("hidden"));
-render();refreshCatalog();
+(() => {
+  "use strict";
+
+  // IMPORTANT: Set this to your deployed backend's HTTPS base URL, with no trailing slash.
+  // Example: const API_BASE = "https://your-yoni-backend.example.com";
+  const API_BASE = "https://YOUR-BACKEND-URL";
+  const BOT_USERNAME = "Yonimargbot";
+  const BOT_LINK = `https://t.me/${BOT_USERNAME}`;
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+  const $ = id => document.getElementById(id);
+  const state = { videos: [], category: "All", query: "", page: "homePage", saved: new Set(readSaved()) };
+
+  function readSaved() {
+    try { return JSON.parse(localStorage.getItem("yoni_saved_codes") || "[]"); } catch (_) { return []; }
+  }
+  function saveSaved() {
+    try { localStorage.setItem("yoni_saved_codes", JSON.stringify([...state.saved])); } catch (_) {}
+  }
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+  }
+  function normalizeVideo(v, index) {
+    const code = String(v.code || v.id || `VIDEO-${index + 1}`);
+    return {
+      ...v,
+      code,
+      title: String(v.title || `Video ${code}`),
+      description: String(v.description || ""),
+      category: String(v.category || "All"),
+      badge: String(v.badge || (Number(v.priceStars || v.price || 0) > 0 ? "PREMIUM" : "NEW")),
+      views: Number(v.views || v.appViews || 0),
+      duration: String(v.duration || ""),
+      price: Number(v.priceStars ?? v.price ?? 0),
+      thumbnail: String(v.thumbnailUrl || v.thumbnail || v.image || "")
+    };
+  }
+  function videoLink(video) {
+    // The current backend supports /start V001 deep links. Telegram requires users to start the bot once.
+    return `${BOT_LINK}?start=${encodeURIComponent(video.code)}`;
+  }
+  function openLink(url) {
+    if (tg && typeof tg.openTelegramLink === "function" && url.startsWith("https://t.me/")) tg.openTelegramLink(url);
+    else window.open(url, "_blank", "noopener,noreferrer");
+  }
+  function notify(message) {
+    if (tg && typeof tg.showAlert === "function") tg.showAlert(message);
+    else window.alert(message);
+  }
+  function setNotice(message) {
+    const box = $("connectionNotice");
+    box.textContent = message;
+    box.classList.add("show");
+  }
+  function clearNotice() { $("connectionNotice").classList.remove("show"); }
+
+  async function loadVideos() {
+    $("catalogStatus").textContent = "Connecting…";
+    if (!API_BASE || API_BASE.includes("YOUR-BACKEND-URL")) {
+      state.videos = [];
+      $("catalogStatus").textContent = "Setup needed";
+      setNotice("The frontend is ready, but the backend address has not been configured yet. Set API_BASE in this file to your deployed backend HTTPS URL.");
+      render();
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE}/api/videos`, { headers: { "Accept": "application/json" }, cache: "no-store" });
+      if (!response.ok) throw new Error(`Server returned ${response.status}`);
+      const data = await response.json();
+      const items = Array.isArray(data) ? data : (Array.isArray(data.videos) ? data.videos : []);
+      state.videos = items.map(normalizeVideo);
+      $("catalogStatus").textContent = "Live catalogue";
+      clearNotice();
+      render();
+    } catch (err) {
+      $("catalogStatus").textContent = "Offline";
+      setNotice("Could not load videos from the backend. Check the backend URL, server status and CORS settings. " + err.message);
+      render();
+    }
+  }
+
+  function filteredVideos() {
+    let items = state.videos.filter(v => state.category === "All" || v.category.toLowerCase() === state.category.toLowerCase());
+    if (state.query) {
+      const q = state.query.toLowerCase();
+      items = items.filter(v => `${v.title} ${v.description} ${v.category} ${v.code}`.toLowerCase().includes(q));
+    }
+    if (state.page === "savedPage") items = items.filter(v => state.saved.has(v.code));
+    if (state.category === "Trending") items = [...items].sort((a,b) => b.views - a.views);
+    return items;
+  }
+  function renderCategories() {
+    const categories = ["All", ...new Set(state.videos.map(v => v.category).filter(c => c && c.toLowerCase() !== "all"))];
+    if (!categories.includes("Trending")) categories.splice(1, 0, "Trending");
+    $("categoryChips").innerHTML = categories.map(c => `<button class="chip ${state.category === c ? "active" : ""}" data-category="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join("");
+  }
+  function cardHTML(v) {
+    const isSaved = state.saved.has(v.code);
+    const thumb = v.thumbnail
+      ? `<img src="${escapeHTML(v.thumbnail)}" alt="" loading="lazy" onerror="this.remove();this.parentElement.insertAdjacentHTML('afterbegin','<span class=&quot;placeholder&quot;>▶</span>')">`
+      : `<span class="placeholder">▶</span>`;
+    return `<article class="card">
+      <div class="thumb">${thumb}<span class="badge">${escapeHTML(v.badge)}</span>${v.duration ? `<span class="duration">${escapeHTML(v.duration)}</span>` : ""}</div>
+      <div class="card-body"><h3 title="${escapeHTML(v.title)}">${escapeHTML(v.title)}</h3>
+      <div class="meta"><span>${escapeHTML(v.category)}</span><span>•</span><span>${v.views.toLocaleString()} views</span></div>
+      <div class="card-actions"><button class="primary" data-watch="${escapeHTML(v.code)}">${v.price > 0 ? `⭐ ${v.price} Stars` : "▶ Watch"}</button><button class="secondary" data-save="${escapeHTML(v.code)}" aria-label="${isSaved ? "Remove saved video" : "Save video"}">${isSaved ? "♥" : "♡"}</button></div></div></article>`;
+  }
+  function renderGrid(target, items, emptyTitle, emptyText) {
+    $(target).innerHTML = items.length ? items.map(cardHTML).join("") : `<div class="empty"><b>${escapeHTML(emptyTitle)}</b>${escapeHTML(emptyText)}</div>`;
+  }
+  function render() {
+    renderCategories();
+    const videos = filteredVideos();
+    $("feedTitle").textContent = state.category === "All" ? "Videos for you" : state.category === "Trending" ? "Trending for you" : state.category;
+    $("videoCount").textContent = `${videos.length} video${videos.length === 1 ? "" : "s"}`;
+    renderGrid("videoGrid", videos, "No videos found", state.videos.length ? "Try another search or category." : "Once the backend is connected and videos are registered, they will appear here.");
+    renderGrid("savedGrid", state.videos.filter(v => state.saved.has(v.code)), "Nothing saved yet", "Tap the ♡ button on a video to save it on this device.");
+  }
+  function switchPage(page) {
+    state.page = page;
+    document.querySelectorAll(".page").forEach(el => el.classList.toggle("active", el.id === page));
+    document.querySelectorAll(".nav button").forEach(el => el.classList.toggle("active", el.dataset.page === page));
+    if (page === "savedPage") render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  document.addEventListener("click", event => {
+    const category = event.target.closest("[data-category]");
+    const watch = event.target.closest("[data-watch]");
+    const save = event.target.closest("[data-save]");
+    const nav = event.target.closest("[data-page]");
+    if (category) {
+      state.category = category.dataset.category;
+      state.page = "homePage";
+      switchPage("homePage");
+      render();
+    }
+    if (watch) {
+      const video = state.videos.find(v => v.code === watch.dataset.watch);
+      if (video) openLink(videoLink(video));
+    }
+    if (save) {
+      const code = save.dataset.save;
+      if (state.saved.has(code)) state.saved.delete(code); else state.saved.add(code);
+      saveSaved();
+      render();
+    }
+    if (nav) switchPage(nav.dataset.page);
+  });
+  $("searchInput").addEventListener("input", event => { state.query = event.target.value.trim(); render(); });
+  $("refreshButton").addEventListener("click", loadVideos);
+  $("aboutButton").addEventListener("click", () => notify("Yoni is a Telegram Mini App. Video delivery, paid access and referral rewards depend on the connected Telegram bot and backend."));
+  function inviteLink() {
+    const userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "";
+    return `${BOT_LINK}?start=${userId ? `ref_${userId}` : "invite"}`;
+  }
+  async function shareInvite() {
+    const link = inviteLink();
+    const text = `Check out Yoni: ${link}`;
+    if (tg && typeof tg.switchInlineQuery === "function") {
+      try { await navigator.clipboard.writeText(text); notify("Invite link copied. Share it with friends."); return; } catch (_) {}
+    }
+    if (navigator.share) {
+      try { await navigator.share({ title: "Yoni", text: "Check out Yoni", url: link }); return; } catch (_) {}
+    }
+    try { await navigator.clipboard.writeText(link); notify("Invite link copied."); }
+    catch (_) { notify(link); }
+  }
+  $("shareButton").addEventListener("click", shareInvite);
+  $("profileShare").addEventListener("click", shareInvite);
+  $("copyInvite").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(inviteLink()); notify("Invite link copied."); }
+    catch (_) { notify(inviteLink()); }
+  });
+
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
+    if (user) {
+      $("profileName").textContent = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Yoni viewer";
+      $("profileHint").textContent = user.username ? `@${user.username}` : "Signed in through Telegram.";
+    }
+  }
+  loadVideos();
 })();
 </script>
-</body></html>
+</body>
+</html>
